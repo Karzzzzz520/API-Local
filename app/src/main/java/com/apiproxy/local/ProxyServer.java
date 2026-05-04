@@ -2,26 +2,20 @@ package com.apiproxy.local;
 
 import android.util.Log;
 import fi.iki.elonen.NanoHTTPD;
-import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-/**
- * 本地HTTP代理服务器 - 基于NanoHTTPD
- * 监听localhost指定端口，将请求转发到目标API并注入API Key
- */
 public class ProxyServer extends NanoHTTPD {
     private static final String TAG = "ProxyServer";
-    
+
     public interface LogCallback {
         void onLog(String message);
     }
@@ -43,9 +37,7 @@ public class ProxyServer extends NanoHTTPD {
 
     private void log(String message) {
         Log.d(TAG, message);
-        if (logCallback != null) {
-            logCallback.onLog(message);
-        }
+        if (logCallback != null) logCallback.onLog(message);
     }
 
     @Override
@@ -53,46 +45,78 @@ public class ProxyServer extends NanoHTTPD {
         try {
             String uri = session.getUri();
             Method method = session.getMethod();
-            
             log(method + " " + uri);
 
-            // 获取请求体
-            Map<String, String> bodyMap = new HashMap<>();
-            if (method == Method.POST || method == Method.PUT || method == Method.PATCH) {
-                try {
-                    session.parseBody(bodyMap);
-                } catch (Exception e) {
-                    log("Parse body error: " + e.getMessage());
-                }
-            }
-            String requestBody = bodyMap.get("postData");
+            // Read body properly
+            byte[] bodyBytes = readBody(session);
 
-            // 找provider
+            // Find provider
             ApiProvider provider = findProvider(uri);
             if (provider == null) {
-                log("No provider found for: " + uri);
-                return newFixedLengthResponse(Response.Status.BAD_REQUEST, 
-                    "application/json", "{\"error\":\"No API provider configured. Please add an API Key first.\"}");
+                log("No provider with API Key configured");
+                return newFixedLengthResponse(Response.Status.INTERNAL_ERROR,
+                    "application/json", "{\"error\":\"No API provider configured. Add an API Key first.\"}");
             }
 
-            // 构建目标URL
+            // Build target URL
             String targetUrl = provider.getBaseUrl() + uri;
-            log("Forwarding to: " + targetUrl);
+            log("-> " + targetUrl);
 
-            // 转发请求
-            return forwardRequest(session, targetUrl, provider, requestBody);
+            // Forward
+            return forwardRequest(session, targetUrl, provider, bodyBytes);
 
         } catch (Exception e) {
-            log("Serve error: " + e.getMessage());
+            log("Error: " + e.getMessage());
             return newFixedLengthResponse(Response.Status.INTERNAL_ERROR,
-                "application/json", "{\"error\":\"" + e.getMessage() + "\"}");
+                "application/json", "{\"error\":\"" + e.getMessage().replace("\"", "'") + "\"}");
         }
+    }
+
+    private byte[] readBody(IHTTPSession session) throws IOException {
+        // NanoHTTPD stores body in inputStream after parseBody
+        Map<String, String> bodyMap = new HashMap<>();
+        try {
+            session.parseBody(bodyMap);
+        } catch (Exception e) {
+            log("Parse body: " + e.getMessage());
+        }
+        
+        String postData = bodyMap.get("postData");
+        if (postData != null && !postData.isEmpty()) {
+            return postData.getBytes(StandardCharsets.UTF_8);
+        }
+        
+        // Fallback: read from content-length
+        long contentLen = getContentLength(session);
+        if (contentLen <= 0) return new byte[0];
+        
+        InputStream is = session.getInputStream();
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        byte[] buf = new byte[4096];
+        long remaining = contentLen;
+        while (remaining > 0) {
+            int toRead = (int) Math.min(buf.length, remaining);
+            int read = is.read(buf, 0, toRead);
+            if (read <= 0) break;
+            bos.write(buf, 0, read);
+            remaining -= read;
+        }
+        return bos.toByteArray();
+    }
+
+    private long getContentLength(IHTTPSession session) {
+        String cl = session.getHeaders().get("content-length");
+        if (cl == null) cl = session.getHeaders().get("Content-Length");
+        if (cl != null) {
+            try { return Long.parseLong(cl); } catch (NumberFormatException ignored) {}
+        }
+        return 0;
     }
 
     private ApiProvider findProvider(String uri) {
         if (providerManager == null) return null;
 
-        // 根据路径前缀匹配
+        // Route by path prefix
         if (uri.startsWith("/gemini/")) {
             for (ApiProvider p : providerManager.getAllProviders()) {
                 if (p.hasApiKey() && p.getId().equals("gemini")) return p;
@@ -111,103 +135,100 @@ public class ProxyServer extends NanoHTTPD {
             }
         }
 
-        // 默认：第一个有Key的provider
+        // Default: first provider with key
         for (ApiProvider p : providerManager.getAllProviders()) {
             if (p.hasApiKey()) return p;
         }
         return null;
     }
 
-    private Response forwardRequest(IHTTPSession session, String targetUrl, 
-                                     ApiProvider provider, String requestBody) {
+    private Response forwardRequest(IHTTPSession session, String targetUrl,
+                                     ApiProvider provider, byte[] bodyBytes) {
         HttpURLConnection conn = null;
         try {
             URL url = new URL(targetUrl);
             conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod(session.getMethod().name());
             conn.setConnectTimeout(30000);
-            conn.setReadTimeout(0);
+            conn.setReadTimeout(120000);
             conn.setDoInput(true);
+            conn.setInstanceFollowRedirects(true);
 
-            // 注入API Key
+            // Inject API Key
             conn.setRequestProperty(provider.getKeyHeader(), provider.getFullKeyValue());
 
-            // 复制其他headers
+            // Forward all headers
             for (Map.Entry<String, String> header : session.getHeaders().entrySet()) {
                 String key = header.getKey();
                 if (key == null) continue;
                 String lowerKey = key.toLowerCase();
-                // 跳过host、已有的key header、content-length（后面自动处理）
-                if (!lowerKey.equals("host") && 
+                if (!lowerKey.equals("host") &&
                     !key.equalsIgnoreCase(provider.getKeyHeader()) &&
                     !lowerKey.equals("content-length")) {
                     conn.setRequestProperty(key, header.getValue());
                 }
             }
 
-            // 写body
-            if (requestBody != null && !requestBody.isEmpty()) {
+            // Write body
+            if (bodyBytes != null && bodyBytes.length > 0) {
                 conn.setDoOutput(true);
-                byte[] bodyBytes = requestBody.getBytes(StandardCharsets.UTF_8);
                 conn.setRequestProperty("Content-Length", String.valueOf(bodyBytes.length));
+                // Ensure content-type is set
+                if (conn.getRequestProperty("Content-Type") == null &&
+                    conn.getRequestProperty("content-type") == null) {
+                    conn.setRequestProperty("Content-Type", "application/json");
+                }
                 OutputStream out = conn.getOutputStream();
                 out.write(bodyBytes);
                 out.flush();
                 out.close();
             }
 
-            // 读取响应
-            int responseCode = conn.getResponseCode();
-            InputStream responseStream = responseCode >= 400 ? conn.getErrorStream() : conn.getInputStream();
-            
-            if (responseStream == null) {
-                log("No response stream, code: " + responseCode);
+            // Read response
+            int code = conn.getResponseCode();
+            InputStream is = code >= 400 ? conn.getErrorStream() : conn.getInputStream();
+            if (is == null) {
+                log("No response, code=" + code);
                 return newFixedLengthResponse(Response.Status.INTERNAL_ERROR,
-                    "application/json", "{\"error\":\"No response from upstream\"}");
+                    "application/json", "{\"error\":\"Empty response from upstream\"}");
             }
 
-            // 检查是否流式
             String contentType = conn.getContentType();
-            boolean isStreaming = contentType != null && 
-                (contentType.contains("text/event-stream") || contentType.contains("text/plain"));
+            if (contentType == null) contentType = "application/json";
 
-            // 复制响应headers
-            Response.IStatus status = Response.Status.lookup(responseCode);
+            boolean streaming = contentType.contains("text/event-stream");
+
+            // Build response status
+            Response.IStatus status = Response.Status.lookup(code);
             if (status == null) status = Response.Status.INTERNAL_ERROR;
-            
+
             Response response;
-            if (isStreaming) {
-                // 流式：用chunked response
-                response = newChunkedResponse(status, contentType, responseStream);
-                log("Streaming response started");
+            int contentLen = conn.getContentLength();
+            if (streaming || contentLen <= 0) {
+                response = newChunkedResponse(status, contentType, is);
             } else {
-                // 非流式：读取完整响应
-                int contentLength = conn.getContentLength();
-                if (contentLength > 0) {
-                    response = newFixedLengthResponse(status, contentType, responseStream, contentLength);
-                } else {
-                    response = newChunkedResponse(status, contentType, responseStream);
-                }
+                response = newFixedLengthResponse(status, contentType, is, contentLen);
             }
 
-            // 复制响应headers
+            // Copy response headers
             for (Map.Entry<String, List<String>> entry : conn.getHeaderFields().entrySet()) {
-                if (entry.getKey() != null && !entry.getKey().equalsIgnoreCase("Content-Length") 
-                    && !entry.getKey().equalsIgnoreCase("Transfer-Encoding")) {
+                if (entry.getKey() != null &&
+                    !entry.getKey().equalsIgnoreCase("Content-Length") &&
+                    !entry.getKey().equalsIgnoreCase("Transfer-Encoding")) {
                     for (String val : entry.getValue()) {
                         response.addHeader(entry.getKey(), val);
                     }
                 }
             }
 
-            log("Response: " + responseCode);
+            log("<- " + code);
             return response;
 
         } catch (IOException e) {
             log("Forward error: " + e.getMessage());
             if (conn != null) conn.disconnect();
             return newFixedLengthResponse(Response.Status.INTERNAL_ERROR,
-                "application/json", "{\"error\":\"Proxy error: " + e.getMessage() + "\"}");
+                "application/json", "{\"error\":\"" + e.getMessage().replace("\"", "'") + "\"}");
         }
     }
 }

@@ -1,5 +1,4 @@
 package com.apiproxy.local;
-import java.io.IOException;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -12,6 +11,7 @@ import android.os.Build;
 import android.os.IBinder;
 import androidx.core.app.NotificationCompat;
 import android.util.Log;
+import java.io.IOException;
 
 public class ProxyService extends Service {
     private static final String TAG = "ProxyService";
@@ -29,16 +29,13 @@ public class ProxyService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.d(TAG, "Service created");
         createNotificationChannel();
         providerManager = new ProviderManager(this);
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if (intent == null) {
-            return START_NOT_STICKY;
-        }
+        if (intent == null) return START_NOT_STICKY;
 
         String action = intent.getAction();
         if (ACTION_START.equals(action)) {
@@ -49,21 +46,21 @@ public class ProxyService extends Service {
             stopForeground(STOP_FOREGROUND_REMOVE);
             stopSelf();
         }
-
         return START_NOT_STICKY;
     }
 
     private void startProxy() {
         if (proxyServer != null && proxyServer.isAlive()) {
             Log.d(TAG, "Proxy already running");
+            sendStatusBroadcast(true);
             return;
         }
 
         proxyServer = new ProxyServer(currentPort);
         proxyServer.setProviderManager(providerManager);
-        
         proxyServer.setLogCallback(message -> {
             Intent broadcast = new Intent(MainActivity.ACTION_LOG);
+            broadcast.setPackage(getPackageName());
             broadcast.putExtra(MainActivity.EXTRA_LOG_MESSAGE, message);
             sendBroadcast(broadcast);
         });
@@ -72,13 +69,10 @@ public class ProxyService extends Service {
             proxyServer.start();
             Log.d(TAG, "Proxy started on port " + currentPort);
             updateNotification(true, currentPort);
-            
-            Intent broadcast = new Intent(MainActivity.ACTION_PROXY_STATUS);
-            broadcast.putExtra(MainActivity.EXTRA_PROXY_RUNNING, true);
-            broadcast.putExtra(MainActivity.EXTRA_PORT, currentPort);
-            sendBroadcast(broadcast);
+            sendStatusBroadcast(true);
         } catch (IOException e) {
             Log.e(TAG, "Failed to start proxy: " + e.getMessage());
+            sendStatusBroadcast(false);
             stopForeground(STOP_FOREGROUND_REMOVE);
             stopSelf();
         }
@@ -88,13 +82,16 @@ public class ProxyService extends Service {
         if (proxyServer != null) {
             proxyServer.stop();
             proxyServer = null;
-            
-            Intent broadcast = new Intent(MainActivity.ACTION_PROXY_STATUS);
-            broadcast.putExtra(MainActivity.EXTRA_PROXY_RUNNING, false);
-            sendBroadcast(broadcast);
-            
-            Log.d(TAG, "Proxy stopped");
+            sendStatusBroadcast(false);
         }
+    }
+
+    private void sendStatusBroadcast(boolean running) {
+        Intent broadcast = new Intent(MainActivity.ACTION_PROXY_STATUS);
+        broadcast.setPackage(getPackageName());
+        broadcast.putExtra(MainActivity.EXTRA_PROXY_RUNNING, running);
+        broadcast.putExtra(MainActivity.EXTRA_PORT, currentPort);
+        sendBroadcast(broadcast);
     }
 
     public boolean isProxyRunning() {
@@ -104,64 +101,47 @@ public class ProxyService extends Service {
     private void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(
-                CHANNEL_ID,
-                getString(R.string.notification_channel_name),
-                NotificationManager.IMPORTANCE_LOW
-            );
+                CHANNEL_ID, getString(R.string.notification_channel_name),
+                NotificationManager.IMPORTANCE_LOW);
             channel.setDescription(getString(R.string.notification_channel_desc));
             channel.setShowBadge(false);
-
             NotificationManager manager = getSystemService(NotificationManager.class);
-            if (manager != null) {
-                manager.createNotificationChannel(channel);
-            }
+            if (manager != null) manager.createNotificationChannel(channel);
         }
     }
 
     private void updateNotification(boolean running, int port) {
         Intent notificationIntent = new Intent(this, MainActivity.class);
         notificationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        
         int flags = PendingIntent.FLAG_UPDATE_CURRENT;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            flags |= PendingIntent.FLAG_IMMUTABLE;
-        }
-        
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) flags |= PendingIntent.FLAG_IMMUTABLE;
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, flags);
 
         Intent stopIntent = new Intent(this, ProxyService.class);
         stopIntent.setAction(ACTION_STOP);
         PendingIntent stopPendingIntent = PendingIntent.getService(this, 1, stopIntent, flags);
 
-        String title = running ? getString(R.string.notification_title_running) 
-                               : getString(R.string.notification_title_stopped);
-        String text = running ? getString(R.string.notification_text_running, port) 
-                              : getString(R.string.notification_text_stopped);
+        String title = running ? getString(R.string.notification_title_running) : getString(R.string.notification_title_stopped);
+        String text = running ? getString(R.string.notification_text_running, port) : getString(R.string.notification_text_stopped);
 
         Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle(title)
-            .setContentText(text)
+            .setContentTitle(title).setContentText(text)
             .setSmallIcon(R.drawable.ic_play)
             .setContentIntent(pendingIntent)
             .addAction(R.drawable.ic_stop, getString(R.string.stop), stopPendingIntent)
-            .setOngoing(true)
-            .setSilent(true)
+            .setOngoing(true).setSilent(true)
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .setCategory(NotificationCompat.CATEGORY_SERVICE)
             .build();
-
         startForeground(NOTIFICATION_ID, notification);
     }
 
     @Override
-    public IBinder onBind(Intent intent) {
-        return null;
-    }
+    public IBinder onBind(Intent intent) { return null; }
 
     @Override
     public void onDestroy() {
         stopProxy();
         super.onDestroy();
-        Log.d(TAG, "Service destroyed");
     }
 }

@@ -64,5 +64,5 @@
     <string name="permission_denied">权限被拒绝，无法启动服务</string>
     
     <!-- 关于 -->
-    <string name="about_message">API Proxy v1.0.0\n\n本地API Key代理转换工具\n\n功能：\n• 本地HTTP代理服务\n• 自动注入API Key\n• 支持SSE流式转发\n• 多API服务商配置\n\n使用方法：\n1. 配置API服务商和Key\n2. 开启代理开关\n3. 将客户端的API地址改为 http://localhost:端口</string>
+    <string name="about_message">API Proxy v1.1.0\n\n本地API Key代理转换工具\n\n功能：\n• 本地HTTP代理服务\n• 自动注入API Key\n• 支持SSE流式转发\n• 多API服务商配置\n\n使用方法：\n1. 配置API服务商和Key\n2. 开启代理开关\n3. 将客户端的API地址改为 http://localhost:端口</string>
 </resources>

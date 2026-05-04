@@ -36,9 +36,6 @@ import android.widget.Spinner;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * 主界面
- */
 public class MainActivity extends AppCompatActivity {
     public static final String ACTION_PROXY_STATUS = "com.apiproxy.local.PROXY_STATUS";
     public static final String ACTION_LOG = "com.apiproxy.local.LOG";
@@ -56,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
     
     private ProviderManager providerManager;
     private boolean isProxyRunning = false;
+    private boolean updatingUI = false;
     private StringBuilder logBuilder = new StringBuilder();
     private final int MAX_LOG_LINES = 100;
 
@@ -87,13 +85,11 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         providerManager = new ProviderManager(this);
-
         initViews();
         setupToolbar();
         setupRecyclerView();
         setupListeners();
         loadSavedPort();
-        
         checkServiceStatus();
     }
 
@@ -105,40 +101,31 @@ public class MainActivity extends AppCompatActivity {
         tvLogsHeader = findViewById(R.id.tv_logs_header);
         logsScroll = findViewById(R.id.logs_scroll);
         FloatingActionButton fab = findViewById(R.id.fab_add);
-
         fab.setOnClickListener(v -> showAddProviderDialog(null));
     }
 
     private void setupToolbar() {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setTitle(R.string.app_name);
-        }
+        if (getSupportActionBar() != null) getSupportActionBar().setTitle(R.string.app_name);
     }
 
     private void setupRecyclerView() {
         adapter = new ProviderAdapter();
         adapter.setOnProviderClickListener(new ProviderAdapter.OnProviderClickListener() {
             @Override
-            public void onProviderClick(ApiProvider provider) {
-                showAddProviderDialog(provider);
-            }
-
+            public void onProviderClick(ApiProvider provider) { showAddProviderDialog(provider); }
             @Override
-            public void onProviderLongClick(ApiProvider provider) {
-                showDeleteProviderDialog(provider);
-            }
+            public void onProviderLongClick(ApiProvider provider) { showDeleteProviderDialog(provider); }
         });
-
         recyclerProviders.setLayoutManager(new LinearLayoutManager(this));
         recyclerProviders.setAdapter(adapter);
-        
         refreshProvidersList();
     }
 
     private void setupListeners() {
         switchProxy.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (updatingUI) return; // Don't react to programmatic changes
             if (isChecked) {
                 requestStartProxy();
             } else {
@@ -147,27 +134,20 @@ public class MainActivity extends AppCompatActivity {
         });
 
         etPort.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {}
-
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
             @Override
             public void afterTextChanged(Editable s) {
                 String port = s.toString().trim();
                 if (!port.isEmpty()) {
                     try {
                         int portInt = Integer.parseInt(port);
-                        if (portInt > 0 && portInt < 65536) {
-                            providerManager.setPort(portInt);
-                        }
+                        if (portInt > 0 && portInt < 65536) providerManager.setPort(portInt);
                     } catch (NumberFormatException ignored) {}
                 }
             }
         });
 
-        // 日志区域点击展开/收起
         tvLogsHeader.setOnClickListener(v -> {
             if (logsScroll.getVisibility() == View.VISIBLE) {
                 logsScroll.setVisibility(View.GONE);
@@ -178,13 +158,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void loadSavedPort() {
-        int savedPort = providerManager.getPort();
-        etPort.setText(String.valueOf(savedPort));
+        etPort.setText(String.valueOf(providerManager.getPort()));
     }
 
     private void refreshProvidersList() {
-        List<ApiProvider> providers = providerManager.getAllProviders();
-        adapter.setProviders(providers);
+        adapter.setProviders(providerManager.getAllProviders());
     }
 
     private void requestStartProxy() {
@@ -192,7 +170,9 @@ public class MainActivity extends AppCompatActivity {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) 
                     != PackageManager.PERMISSION_GRANTED) {
                 notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
+                updatingUI = true;
                 switchProxy.setChecked(false);
+                updatingUI = false;
                 return;
             }
         }
@@ -200,18 +180,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void startProxyService() {
-        String portStr = etPort.getText().toString().trim();
         int port = 8080;
-        try {
-            port = Integer.parseInt(portStr);
-        } catch (NumberFormatException e) {
-            Toast.makeText(this, R.string.invalid_port, Toast.LENGTH_SHORT).show();
-        }
-
+        try { port = Integer.parseInt(etPort.getText().toString().trim()); }
+        catch (NumberFormatException ignored) {}
+        
         Intent intent = new Intent(this, ProxyService.class);
         intent.setAction(ProxyService.ACTION_START);
         intent.putExtra(ProxyService.EXTRA_PORT, port);
-        
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             startForegroundService(intent);
         } else {
@@ -231,46 +206,46 @@ public class MainActivity extends AppCompatActivity {
 
     private void updateProxyStatus(boolean running) {
         this.isProxyRunning = running;
+        updatingUI = true;
         switchProxy.setChecked(running);
+        updatingUI = false;
         
         View statusView = findViewById(R.id.status_indicator);
-        GradientDrawable drawable = new GradientDrawable();
-        drawable.setShape(GradientDrawable.OVAL);
-        drawable.setColor(running ? Color.parseColor("#4CAF50") : Color.parseColor("#9E9E9E"));
-        statusView.setBackground(drawable);
+        if (statusView != null) {
+            GradientDrawable drawable = new GradientDrawable();
+            drawable.setShape(GradientDrawable.OVAL);
+            drawable.setColor(running ? Color.parseColor("#4CAF50") : Color.parseColor("#9E9E9E"));
+            statusView.setBackground(drawable);
+        }
         
         TextView tvStatus = findViewById(R.id.tv_status);
-        tvStatus.setText(running ? R.string.status_running : R.string.status_stopped);
+        if (tvStatus != null) {
+            tvStatus.setText(running ? R.string.status_running : R.string.status_stopped);
+        }
     }
 
     private void appendLog(String message) {
         runOnUiThread(() -> {
-            if (logBuilder.length() > 0) {
-                logBuilder.append("\n");
-            }
+            if (logBuilder.length() > 0) logBuilder.append("\n");
             logBuilder.append(message);
             
             String[] lines = logBuilder.toString().split("\n");
             if (lines.length > MAX_LOG_LINES) {
-                StringBuilder newBuilder = new StringBuilder();
+                StringBuilder nb = new StringBuilder();
                 for (int i = lines.length - MAX_LOG_LINES; i < lines.length; i++) {
-                    if (newBuilder.length() > 0) newBuilder.append("\n");
-                    newBuilder.append(lines[i]);
+                    if (nb.length() > 0) nb.append("\n");
+                    nb.append(lines[i]);
                 }
-                logBuilder = newBuilder;
+                logBuilder = nb;
             }
             
             tvLogs.setText(logBuilder.toString());
-            
-            if (logsScroll != null) {
-                logsScroll.post(() -> logsScroll.fullScroll(View.FOCUS_DOWN));
-            }
+            if (logsScroll != null) logsScroll.post(() -> logsScroll.fullScroll(View.FOCUS_DOWN));
         });
     }
 
     private void showAddProviderDialog(ApiProvider existingProvider) {
         View dialogView = getLayoutInflater().inflate(R.layout.dialog_add_provider, null);
-        
         AutoCompleteTextView actvName = dialogView.findViewById(R.id.actv_name);
         TextInputEditText etBaseUrl = dialogView.findViewById(R.id.et_base_url);
         TextInputEditText etApiKey = dialogView.findViewById(R.id.et_api_key);
@@ -279,19 +254,13 @@ public class MainActivity extends AppCompatActivity {
         Spinner spinnerKeyType = dialogView.findViewById(R.id.spinner_key_type);
 
         String[] presetNames = {"OpenAI", "Gemini", "Claude", "DeepSeek", "自定义"};
-        ArrayAdapter<String> nameAdapter = new ArrayAdapter<>(this, 
-            android.R.layout.simple_dropdown_item_1line, presetNames);
-        actvName.setAdapter(nameAdapter);
+        actvName.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, presetNames));
 
         String[] headerOptions = {"Authorization", "x-api-key", "x-goog-api-key", "api-key", "自定义"};
-        ArrayAdapter<String> headerAdapter = new ArrayAdapter<>(this,
-            android.R.layout.simple_dropdown_item_1line, headerOptions);
-        actvKeyHeader.setAdapter(headerAdapter);
+        actvKeyHeader.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, headerOptions));
 
         String[] keyTypes = {"Bearer (如 OpenAI, DeepSeek)", "无前缀 (如 Gemini, Claude)"};
-        ArrayAdapter<String> typeAdapter = new ArrayAdapter<>(this,
-            android.R.layout.simple_dropdown_item_1line, keyTypes);
-        spinnerKeyType.setAdapter(typeAdapter);
+        spinnerKeyType.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, keyTypes));
 
         if (existingProvider != null) {
             actvName.setText(existingProvider.getName());
@@ -299,63 +268,43 @@ public class MainActivity extends AppCompatActivity {
             etApiKey.setText(existingProvider.getApiKey());
             actvKeyHeader.setText(existingProvider.getKeyHeader());
             etKeyPrefix.setText(existingProvider.getKeyPrefix());
-            
-            if (existingProvider.getKeyPrefix() == null || 
-                existingProvider.getKeyPrefix().isEmpty()) {
-                spinnerKeyType.setSelection(1);
-            } else {
-                spinnerKeyType.setSelection(0);
-            }
+            spinnerKeyType.setSelection(existingProvider.getKeyPrefix().isEmpty() ? 1 : 0);
         }
 
         actvName.setOnItemClickListener((parent, view, position, id) -> {
-            String selected = (String) parent.getItemAtPosition(position);
-            switch (selected) {
+            switch ((String) parent.getItemAtPosition(position)) {
                 case "OpenAI":
                     etBaseUrl.setText("https://api.openai.com");
                     actvKeyHeader.setText("Authorization");
                     etKeyPrefix.setText("Bearer ");
-                    spinnerKeyType.setSelection(0);
-                    break;
+                    spinnerKeyType.setSelection(0); break;
                 case "Gemini":
                     etBaseUrl.setText("https://generativelanguage.googleapis.com");
                     actvKeyHeader.setText("x-goog-api-key");
                     etKeyPrefix.setText("");
-                    spinnerKeyType.setSelection(1);
-                    break;
+                    spinnerKeyType.setSelection(1); break;
                 case "Claude":
                     etBaseUrl.setText("https://api.anthropic.com");
                     actvKeyHeader.setText("x-api-key");
                     etKeyPrefix.setText("");
-                    spinnerKeyType.setSelection(1);
-                    break;
+                    spinnerKeyType.setSelection(1); break;
                 case "DeepSeek":
                     etBaseUrl.setText("https://api.deepseek.com");
                     actvKeyHeader.setText("Authorization");
                     etKeyPrefix.setText("Bearer ");
-                    spinnerKeyType.setSelection(0);
-                    break;
+                    spinnerKeyType.setSelection(0); break;
             }
         });
 
         spinnerKeyType.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(android.widget.AdapterView<?> parent, View view, int position, long id) {
-                if (position == 0) {
-                    etKeyPrefix.setText("Bearer ");
-                } else {
-                    etKeyPrefix.setText("");
-                }
+            @Override public void onItemSelected(android.widget.AdapterView<?> parent, View v, int pos, long id) {
+                etKeyPrefix.setText(pos == 0 ? "Bearer " : "");
             }
-            @Override
-            public void onNothingSelected(android.widget.AdapterView<?> parent) {}
+            @Override public void onNothingSelected(android.widget.AdapterView<?> parent) {}
         });
 
-        String title = existingProvider != null ? 
-            getString(R.string.edit_provider) : getString(R.string.add_provider);
-
         new MaterialAlertDialogBuilder(this)
-            .setTitle(title)
+            .setTitle(existingProvider != null ? R.string.edit_provider : R.string.add_provider)
             .setView(dialogView)
             .setPositiveButton(R.string.save, (dialog, which) -> {
                 String name = actvName.getText().toString().trim();
@@ -363,21 +312,14 @@ public class MainActivity extends AppCompatActivity {
                 String apiKey = etApiKey.getText().toString().trim();
                 String keyHeader = actvKeyHeader.getText().toString().trim();
                 String keyPrefix = etKeyPrefix.getText().toString();
-
                 if (name.isEmpty() || baseUrl.isEmpty()) {
                     Toast.makeText(this, R.string.fill_required_fields, Toast.LENGTH_SHORT).show();
                     return;
                 }
-
-                String id = existingProvider != null ? existingProvider.getId() : 
+                String id = existingProvider != null ? existingProvider.getId() :
                     name.toLowerCase().replaceAll("[^a-z0-9]", "") + "_" + System.currentTimeMillis();
-
-                ApiProvider provider = new ApiProvider(id, name, baseUrl, apiKey, 
-                    keyHeader, keyPrefix, null);
-                
-                providerManager.addProvider(provider);
+                providerManager.addProvider(new ApiProvider(id, name, baseUrl, apiKey, keyHeader, keyPrefix, null));
                 refreshProvidersList();
-                
                 Toast.makeText(this, R.string.provider_saved, Toast.LENGTH_SHORT).show();
             })
             .setNegativeButton(R.string.cancel, null)
@@ -388,50 +330,34 @@ public class MainActivity extends AppCompatActivity {
         new MaterialAlertDialogBuilder(this)
             .setTitle(R.string.delete_provider)
             .setMessage(getString(R.string.delete_provider_confirm, provider.getName()))
-            .setPositiveButton(R.string.delete, (dialog, which) -> {
+            .setPositiveButton(R.string.delete, (d, w) -> {
                 providerManager.removeProvider(provider.getId());
                 refreshProvidersList();
-                Toast.makeText(this, R.string.provider_deleted, Toast.LENGTH_SHORT).show();
             })
             .setNegativeButton(R.string.cancel, null)
             .show();
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
+    @Override public boolean onCreateOptionsMenu(Menu menu) { getMenuInflater().inflate(R.menu.menu_main, menu); return true; }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if (id == R.id.action_clear_logs) {
-            logBuilder.setLength(0);
-            tvLogs.setText("");
-            return true;
-        } else if (id == R.id.action_copy_url) {
-            int port = providerManager.getPort();
-            String url = "http://localhost:" + port;
-            android.content.ClipboardManager clipboard = (android.content.ClipboardManager) 
-                getSystemService(Context.CLIPBOARD_SERVICE);
-            android.content.ClipData clip = android.content.ClipData.newPlainText("Proxy URL", url);
-            clipboard.setPrimaryClip(clip);
+        if (id == R.id.action_clear_logs) { logBuilder.setLength(0); tvLogs.setText(""); return true; }
+        if (id == R.id.action_copy_url) {
+            String url = "http://localhost:" + providerManager.getPort();
+            android.content.ClipboardManager cb = (android.content.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+            cb.setPrimaryClip(android.content.ClipData.newPlainText("Proxy URL", url));
             Toast.makeText(this, R.string.url_copied, Toast.LENGTH_SHORT).show();
             return true;
-        } else if (id == R.id.action_about) {
-            showAboutDialog();
-            return true;
         }
+        if (id == R.id.action_about) { showAboutDialog(); return true; }
         return super.onOptionsItemSelected(item);
     }
 
     private void showAboutDialog() {
-        new MaterialAlertDialogBuilder(this)
-            .setTitle(R.string.app_name)
-            .setMessage(R.string.about_message)
-            .setPositiveButton(R.string.ok, null)
-            .show();
+        new MaterialAlertDialogBuilder(this).setTitle(R.string.app_name)
+            .setMessage(R.string.about_message).setPositiveButton(R.string.ok, null).show();
     }
 
     @Override
@@ -450,8 +376,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        try {
-            unregisterReceiver(statusReceiver);
-        } catch (Exception ignored) {}
+        try { unregisterReceiver(statusReceiver); } catch (Exception ignored) {}
     }
 }
