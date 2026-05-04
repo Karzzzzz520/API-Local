@@ -25,38 +25,44 @@ jobs:
           distribution: temurin
           java-version: 17
 
+      - name: Decode Keystore
+        run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > app/Kars.jks
+
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
-      - name: Build Debug APK
-        run: ./gradlew assembleDebug --no-daemon
+      - name: Build Release APK
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: kars
+        run: ./gradlew assembleRelease --no-daemon
 
       - name: Rename APK
         run: |
-          cd app/build/outputs/apk/debug
-          mv app-debug.apk API-Proxy-v1.0.2.apk
+          cd app/build/outputs/apk/release
+          mv app-release.apk API-Proxy-v1.0.3.apk
           ls -la
 
       - name: Upload APK as Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: API-Proxy-v1.0.2
-          path: app/build/outputs/apk/debug/API-Proxy-v1.0.2.apk
+          name: API-Proxy-v1.0.3
+          path: app/build/outputs/apk/release/API-Proxy-v1.0.3.apk
           retention-days: 30
 
       - name: Create Release and Upload APK
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v1.0.2
-          name: API Proxy v1.0.2
+          tag_name: v1.0.3
+          name: API Proxy v1.0.3
           body: |
-            ## API Proxy v1.0.2 - 闪退修复版
+            ## API Proxy v1.0.3 - 正式签名版
             
             ### 修复
             - 🐛 修复启动闪退（缺少 setContentView）
             - 🐛 修复日志展开/收起逻辑
             - 🔄 重写代理转发，改用 HttpsURLConnection（支持HTTPS）
-            - ⚡ 流式响应更稳定
+            - 🔐 正式签名（Kars.jks）
             
             ### 功能
             - 🔄 本地HTTP代理服务器
@@ -64,7 +70,6 @@ jobs:
             - 📡 支持SSE流式转发
             - 🎨 Material You 风格界面
             - ⚙️ 预设OpenAI/Gemini/Claude/DeepSeek配置
-            - 📋 实时转发日志
-          files: app/build/outputs/apk/debug/API-Proxy-v1.0.2.apk
+          files: app/build/outputs/apk/release/API-Proxy-v1.0.3.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
