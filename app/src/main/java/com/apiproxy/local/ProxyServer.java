@@ -413,7 +413,7 @@ public class ProxyServer {
             
             // 使用带超时的读取来检测连接关闭
             while (!Thread.currentThread().isInterrupted()) {
-                int ch;
+                int ch = -1;
                 try {
                     // 检查是否有数据可用
                     if (reader.ready()) {

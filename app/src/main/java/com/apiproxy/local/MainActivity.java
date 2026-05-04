@@ -13,6 +13,7 @@ import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ScrollView;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -268,7 +269,7 @@ public class MainActivity extends AppCompatActivity {
             tvLogs.setText(logBuilder.toString());
             
             // 自动滚动到底部
-            View scrollView = findViewById(R.id.logs_scroll);
+            ScrollView scrollView = findViewById(R.id.logs_scroll);
             if (scrollView != null) {
                 scrollView.post(() -> scrollView.fullScroll(View.FOCUS_DOWN));
             }
