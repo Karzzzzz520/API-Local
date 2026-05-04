@@ -115,21 +115,32 @@ public class ProxyServer extends NanoHTTPD {
             conn.setDoInput(true);
             conn.setInstanceFollowRedirects(true);
 
-            // Inject API Key
-            conn.setRequestProperty(provider.getKeyHeader(), provider.getFullKeyValue());
-
-            // Forward headers
+            // Forward headers FIRST (excluding auth and host)
             int headerCount = 0;
             for (Map.Entry<String, String> h : session.getHeaders().entrySet()) {
                 String k = h.getKey();
                 if (k == null) continue;
                 String lk = k.toLowerCase();
-                if (!lk.equals("host") && !k.equalsIgnoreCase(provider.getKeyHeader()) && !lk.equals("content-length")) {
+                // Skip host, auth-related, content-length - we set these ourselves
+                if (!lk.equals("host") && 
+                    !lk.equals("content-length") &&
+                    !k.equalsIgnoreCase(provider.getKeyHeader()) &&
+                    !lk.contains("authorization") &&
+                    !lk.contains("x-api-key") &&
+                    !lk.contains("x-goog-api-key") &&
+                    !lk.contains("api-key")) {
                     conn.setRequestProperty(k, h.getValue());
                     headerCount++;
                 }
             }
-            log("Forwarded " + headerCount + " headers");
+            
+            // Force correct Host based on target URL
+            conn.setRequestProperty("Host", url.getHost());
+            
+            // Inject API Key (AFTER other headers so it takes priority)
+            conn.setRequestProperty(provider.getKeyHeader(), provider.getFullKeyValue());
+            
+            log("Forwarded " + headerCount + " headers + Host + API Key");
 
             // Write body
             if (bodyBytes.length > 0) {
