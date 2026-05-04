@@ -14,13 +14,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ScrollView;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
@@ -35,7 +33,6 @@ import android.graphics.drawable.GradientDrawable;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Spinner;
-import android.widget.LinearLayout;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
     private ProviderAdapter adapter;
     private TextView tvLogs;
     private View tvLogsHeader;
+    private ScrollView logsScroll;
     
     private ProviderManager providerManager;
     private boolean isProxyRunning = false;
@@ -86,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Enable edge-to-edge for Android 15+
+        setContentView(R.layout.activity_main);
 
         providerManager = new ProviderManager(this);
 
@@ -96,7 +94,6 @@ public class MainActivity extends AppCompatActivity {
         setupListeners();
         loadSavedPort();
         
-        // 检查服务状态
         checkServiceStatus();
     }
 
@@ -106,6 +103,7 @@ public class MainActivity extends AppCompatActivity {
         recyclerProviders = findViewById(R.id.recycler_providers);
         tvLogs = findViewById(R.id.tv_logs);
         tvLogsHeader = findViewById(R.id.tv_logs_header);
+        logsScroll = findViewById(R.id.logs_scroll);
         FloatingActionButton fab = findViewById(R.id.fab_add);
 
         fab.setOnClickListener(v -> showAddProviderDialog(null));
@@ -170,12 +168,11 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // 日志区域点击展开/收起
-        View tvLogsHeader = findViewById(R.id.tv_logs_header);
         tvLogsHeader.setOnClickListener(v -> {
-            if (tvLogsHeader.getVisibility() == View.VISIBLE) {
-                tvLogsHeader.setVisibility(View.GONE);
+            if (logsScroll.getVisibility() == View.VISIBLE) {
+                logsScroll.setVisibility(View.GONE);
             } else {
-                tvLogsHeader.setVisibility(View.VISIBLE);
+                logsScroll.setVisibility(View.VISIBLE);
             }
         });
     }
@@ -229,7 +226,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void checkServiceStatus() {
-        // 默认认为未运行，由服务广播状态
         updateProxyStatus(false);
     }
 
@@ -237,7 +233,6 @@ public class MainActivity extends AppCompatActivity {
         this.isProxyRunning = running;
         switchProxy.setChecked(running);
         
-        // 更新状态指示
         View statusView = findViewById(R.id.status_indicator);
         GradientDrawable drawable = new GradientDrawable();
         drawable.setShape(GradientDrawable.OVAL);
@@ -255,7 +250,6 @@ public class MainActivity extends AppCompatActivity {
             }
             logBuilder.append(message);
             
-            // 限制日志行数
             String[] lines = logBuilder.toString().split("\n");
             if (lines.length > MAX_LOG_LINES) {
                 StringBuilder newBuilder = new StringBuilder();
@@ -268,10 +262,8 @@ public class MainActivity extends AppCompatActivity {
             
             tvLogs.setText(logBuilder.toString());
             
-            // 自动滚动到底部
-            ScrollView scrollView = findViewById(R.id.logs_scroll);
-            if (scrollView != null) {
-                scrollView.post(() -> scrollView.fullScroll(View.FOCUS_DOWN));
+            if (logsScroll != null) {
+                logsScroll.post(() -> logsScroll.fullScroll(View.FOCUS_DOWN));
             }
         });
     }
@@ -286,25 +278,21 @@ public class MainActivity extends AppCompatActivity {
         TextInputEditText etKeyPrefix = dialogView.findViewById(R.id.et_key_prefix);
         Spinner spinnerKeyType = dialogView.findViewById(R.id.spinner_key_type);
 
-        // 预设名称列表
         String[] presetNames = {"OpenAI", "Gemini", "Claude", "DeepSeek", "自定义"};
         ArrayAdapter<String> nameAdapter = new ArrayAdapter<>(this, 
             android.R.layout.simple_dropdown_item_1line, presetNames);
         actvName.setAdapter(nameAdapter);
 
-        // Key Header选项
         String[] headerOptions = {"Authorization", "x-api-key", "x-goog-api-key", "api-key", "自定义"};
         ArrayAdapter<String> headerAdapter = new ArrayAdapter<>(this,
             android.R.layout.simple_dropdown_item_1line, headerOptions);
         actvKeyHeader.setAdapter(headerAdapter);
 
-        // Key类型（Bearer前缀）
         String[] keyTypes = {"Bearer (如 OpenAI, DeepSeek)", "无前缀 (如 Gemini, Claude)"};
         ArrayAdapter<String> typeAdapter = new ArrayAdapter<>(this,
             android.R.layout.simple_dropdown_item_1line, keyTypes);
         spinnerKeyType.setAdapter(typeAdapter);
 
-        // 如果是编辑模式，填充现有数据
         if (existingProvider != null) {
             actvName.setText(existingProvider.getName());
             etBaseUrl.setText(existingProvider.getBaseUrl());
@@ -312,7 +300,6 @@ public class MainActivity extends AppCompatActivity {
             actvKeyHeader.setText(existingProvider.getKeyHeader());
             etKeyPrefix.setText(existingProvider.getKeyPrefix());
             
-            // 设置Key类型
             if (existingProvider.getKeyPrefix() == null || 
                 existingProvider.getKeyPrefix().isEmpty()) {
                 spinnerKeyType.setSelection(1);
@@ -321,7 +308,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        // 预设名称选择事件
         actvName.setOnItemClickListener((parent, view, position, id) -> {
             String selected = (String) parent.getItemAtPosition(position);
             switch (selected) {
@@ -352,7 +338,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // Key类型选择事件
         spinnerKeyType.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(android.widget.AdapterView<?> parent, View view, int position, long id) {

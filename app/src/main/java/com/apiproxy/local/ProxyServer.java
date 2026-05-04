@@ -122,14 +122,12 @@ public class ProxyServer {
 
             log("Request: " + request.method + " " + request.path);
             
-            // 确定目标URL
             String targetUrl = resolveTargetUrl(request);
             if (targetUrl == null) {
                 sendError(clientSocket, 400, "No valid target API configured");
                 return;
             }
 
-            // 找到对应的provider
             ApiProvider provider = findProvider(request);
             if (provider == null) {
                 sendError(clientSocket, 400, "No matching API provider found");
@@ -138,7 +136,6 @@ public class ProxyServer {
 
             log("Forwarding to: " + targetUrl);
 
-            // 转发请求
             forwardRequest(clientSocket, request, targetUrl, provider);
 
         } catch (Exception e) {
@@ -166,7 +163,6 @@ public class ProxyServer {
             request.method = parts[0];
             request.path = parts[1];
 
-            // 解析headers
             String line;
             while ((line = reader.readLine()) != null && !line.isEmpty()) {
                 int colonIndex = line.indexOf(':');
@@ -177,7 +173,6 @@ public class ProxyServer {
                 }
             }
 
-            // 读取body
             if (request.headers.containsKey("Content-Length")) {
                 int contentLength = Integer.parseInt(request.headers.get("Content-Length"));
                 char[] body = new char[contentLength];
@@ -187,7 +182,6 @@ public class ProxyServer {
                 }
             }
 
-            // 检查是否SSE/流式请求
             String accept = request.headers.get("Accept");
             if (accept != null && accept.contains("text/event-stream")) {
                 request.isStreaming = true;
@@ -201,30 +195,25 @@ public class ProxyServer {
     }
 
     private String resolveTargetUrl(HttpRequest request) {
-        // 首先检查X-Target-URL header
         String targetUrl = request.headers.get("X-Target-URL");
         if (targetUrl != null && !targetUrl.isEmpty()) {
             return targetUrl;
         }
 
-        // 从path解析provider
         String path = request.path;
         if (path.startsWith("/v1/")) {
-            // OpenAI兼容格式
             for (ApiProvider provider : providerManager.getAllProviders()) {
                 if (provider.hasApiKey() && path.startsWith("/v1")) {
                     return provider.getBaseUrl() + path;
                 }
             }
         } else if (path.startsWith("/api/")) {
-            // Gemini格式
             for (ApiProvider provider : providerManager.getAllProviders()) {
                 if (provider.hasApiKey() && provider.getId().equals("gemini")) {
                     return provider.getBaseUrl() + path;
                 }
             }
         } else if (path.startsWith("/anthropic/")) {
-            // Claude格式
             for (ApiProvider provider : providerManager.getAllProviders()) {
                 if (provider.hasApiKey() && provider.getId().equals("claude")) {
                     return provider.getBaseUrl() + path;
@@ -232,7 +221,6 @@ public class ProxyServer {
             }
         }
 
-        // 返回第一个有配置的provider
         for (ApiProvider provider : providerManager.getAllProviders()) {
             if (provider.hasApiKey()) {
                 return provider.getBaseUrl() + path;
@@ -256,7 +244,6 @@ public class ProxyServer {
             } catch (Exception ignored) {}
         }
 
-        // 匹配baseUrl
         for (ApiProvider provider : providerManager.getAllProviders()) {
             if (provider.hasApiKey()) {
                 return provider;
@@ -273,200 +260,111 @@ public class ProxyServer {
             int urlPort = url.getPort() != -1 ? url.getPort() : 
                           (url.getProtocol().equals("https") ? 443 : 80);
             
-            Socket targetSocket = new Socket(url.getHost(), urlPort);
-            targetSocket.setSoTimeout(0); // 无超时，支持长连接
-
-            // 构建转发请求
-            StringBuilder requestBuilder = new StringBuilder();
-            requestBuilder.append(request.method).append(" ").append(url.getFile())
-                         .append(" HTTP/1.1\r\n");
+            // Use HttpsURLConnection for https URLs
+            javax.net.ssl.HttpsURLConnection conn = (javax.net.ssl.HttpsURLConnection) url.openConnection();
+            conn.setRequestMethod(request.method);
+            conn.setDoInput(true);
+            conn.setConnectTimeout(30000);
+            conn.setReadTimeout(0); // No read timeout for streaming
             
-            // Host header
-            requestBuilder.append("Host: ").append(url.getHost());
-            if (urlPort != 80 && urlPort != 443) {
-                requestBuilder.append(":").append(urlPort);
-            }
-            requestBuilder.append("\r\n");
-
-            // 添加API Key
-            requestBuilder.append(provider.getKeyHeader()).append(": ")
-                         .append(provider.getFullKeyValue()).append("\r\n");
-
-            // 添加其他headers
+            // Add API Key header
+            conn.setRequestProperty(provider.getKeyHeader(), provider.getFullKeyValue());
+            
+            // Add other headers
             for (Map.Entry<String, String> entry : request.headers.entrySet()) {
                 String key = entry.getKey();
                 if (!key.equalsIgnoreCase("Host") && 
                     !key.equalsIgnoreCase(provider.getKeyHeader()) &&
                     !key.equalsIgnoreCase("X-Target-URL") &&
                     !key.equalsIgnoreCase("Content-Length")) {
-                    requestBuilder.append(key).append(": ").append(entry.getValue())
-                                 .append("\r\n");
+                    conn.setRequestProperty(key, entry.getValue());
                 }
             }
-
-            // Content-Length
-            if (request.body != null) {
-                requestBuilder.append("Content-Length: ").append(request.body.length())
-                             .append("\r\n");
-            }
-
-            requestBuilder.append("\r\n");
-
-            OutputStream out = targetSocket.getOutputStream();
-            out.write(requestBuilder.toString().getBytes(StandardCharsets.UTF_8));
             
-            if (request.body != null) {
-                out.write(request.body.getBytes(StandardCharsets.UTF_8));
+            // Write body if present
+            if (request.body != null && !request.body.isEmpty()) {
+                conn.setDoOutput(true);
+                byte[] bodyBytes = request.body.getBytes(StandardCharsets.UTF_8);
+                conn.setRequestProperty("Content-Length", String.valueOf(bodyBytes.length));
+                OutputStream out = conn.getOutputStream();
+                out.write(bodyBytes);
+                out.flush();
             }
-            out.flush();
 
             log("Request forwarded, receiving response...");
 
-            // 转发响应
-            forwardResponse(targetSocket, clientSocket, request.isStreaming);
+            // Read response
+            int responseCode = conn.getResponseCode();
+            java.io.InputStream responseStream = responseCode >= 400 ? conn.getErrorStream() : conn.getInputStream();
+            
+            if (responseStream == null) {
+                sendError(clientSocket, 502, "No response from target API");
+                return;
+            }
+            
+            // Build HTTP response
+            StringBuilder responseBuilder = new StringBuilder();
+            responseBuilder.append("HTTP/1.1 ").append(responseCode).append(" ")
+                .append(getStatusText(responseCode)).append("\r\n");
+            
+            // Response headers
+            for (Map.Entry<String, java.util.List<String>> entry : conn.getHeaderFields().entrySet()) {
+                if (entry.getKey() != null) {
+                    for (String value : entry.getValue()) {
+                        responseBuilder.append(entry.getKey()).append(": ").append(value).append("\r\n");
+                    }
+                }
+            }
+            responseBuilder.append("\r\n");
+            
+            OutputStream clientOut = clientSocket.getOutputStream();
+            clientOut.write(responseBuilder.toString().getBytes(StandardCharsets.UTF_8));
+            clientOut.flush();
+            
+            // Stream response body
+            byte[] buffer = new byte[8192];
+            int read;
+            while ((read = responseStream.read(buffer)) > 0) {
+                clientOut.write(buffer, 0, read);
+                clientOut.flush();
+            }
+            
+            clientOut.flush();
+            log("Response forwarded complete");
+            
+            conn.disconnect();
 
         } catch (IOException e) {
             log("Forward error: " + e.getMessage());
             sendError(clientSocket, 502, "Proxy forward failed: " + e.getMessage());
         }
     }
-
-    private void forwardResponse(Socket targetSocket, Socket clientSocket, boolean isStreaming) {
-        try {
-            InputStreamReader reader = new InputStreamReader(targetSocket.getInputStream(), StandardCharsets.UTF_8);
-            BufferedReader bufferedReader = new BufferedReader(reader);
-            OutputStream clientOut = clientSocket.getOutputStream();
-
-            // 读取状态行
-            String statusLine = bufferedReader.readLine();
-            if (statusLine == null) return;
-
-            clientOut.write((statusLine + "\r\n").getBytes(StandardCharsets.UTF_8));
-
-            // 读取headers
-            Map<String, String> responseHeaders = new HashMap<>();
-            String line;
-            int contentLength = -1;
-            boolean chunked = false;
-
-            while ((line = bufferedReader.readLine()) != null && !line.isEmpty()) {
-                clientOut.write((line + "\r\n").getBytes(StandardCharsets.UTF_8));
-                
-                int colonIndex = line.indexOf(':');
-                if (colonIndex > 0) {
-                    String key = line.substring(0, colonIndex).trim().toLowerCase();
-                    String value = line.substring(colonIndex + 1).trim();
-                    responseHeaders.put(key, value);
-                    
-                    if (key.equals("content-length")) {
-                        contentLength = Integer.parseInt(value);
-                    } else if (key.equals("transfer-encoding") && value.equalsIgnoreCase("chunked")) {
-                        chunked = true;
-                    }
-                }
-            }
-            clientOut.write("\r\n".getBytes(StandardCharsets.UTF_8));
-            clientOut.flush();
-
-            log("Response headers sent, streaming: " + isStreaming);
-
-            if (isStreaming || chunked) {
-                // 流式响应
-                forwardStreaming(bufferedReader, clientOut);
-            } else if (contentLength > 0) {
-                // 普通响应
-                byte[] buffer = new byte[8192];
-                int totalRead = 0;
-                while (totalRead < contentLength) {
-                    int remaining = contentLength - totalRead;
-                    int toRead = Math.min(buffer.length, remaining);
-                    int read = targetSocket.getInputStream().read(buffer, 0, toRead);
-                    if (read <= 0) break;
-                    clientOut.write(buffer, 0, read);
-                    totalRead += read;
-                }
-            } else {
-                // 读取全部
-                byte[] buffer = new byte[8192];
-                int read;
-                while ((read = targetSocket.getInputStream().read(buffer)) > 0) {
-                    clientOut.write(buffer, 0, read);
-                }
-            }
-
-            clientOut.flush();
-            log("Response forwarded complete");
-
-        } catch (IOException e) {
-            log("Forward response error: " + e.getMessage());
-        } finally {
-            try {
-                targetSocket.close();
-            } catch (IOException ignored) {}
-        }
-    }
-
-    private void forwardStreaming(BufferedReader reader, OutputStream out) {
-        try {
-            char[] buffer = new char[8192];
-            int lastRead = 0;
-            
-            // 使用带超时的读取来检测连接关闭
-            while (!Thread.currentThread().isInterrupted()) {
-                int ch = -1;
-                try {
-                    // 检查是否有数据可用
-                    if (reader.ready()) {
-                        ch = reader.read();
-                        if (ch == -1) break;
-                        
-                        // 回写缓冲的数据
-                        if (lastRead > 0) {
-                            out.write(new String(buffer, 0, lastRead).getBytes(StandardCharsets.UTF_8));
-                            lastRead = 0;
-                        }
-                        out.write(ch);
-                        out.flush();
-                    } else {
-                        // 累积buffer
-                        if (lastRead >= buffer.length) {
-                            out.write(new String(buffer, 0, lastRead).getBytes(StandardCharsets.UTF_8));
-                            out.flush();
-                            lastRead = 0;
-                        }
-                        buffer[lastRead++] = (char) ch;
-                        
-                        // 小延迟避免忙等
-                        Thread.sleep(10);
-                    }
-                } catch (java.net.SocketTimeoutException e) {
-                    // 超时，检查是否需要继续
-                    if (lastRead > 0) {
-                        out.write(new String(buffer, 0, lastRead).getBytes(StandardCharsets.UTF_8));
-                        out.flush();
-                        lastRead = 0;
-                    }
-                }
-            }
-            
-            // 发送剩余数据
-            if (lastRead > 0) {
-                out.write(new String(buffer, 0, lastRead).getBytes(StandardCharsets.UTF_8));
-                out.flush();
-            }
-        } catch (Exception e) {
-            log("Streaming error: " + e.getMessage());
+    
+    private String getStatusText(int code) {
+        switch (code) {
+            case 200: return "OK";
+            case 201: return "Created";
+            case 204: return "No Content";
+            case 400: return "Bad Request";
+            case 401: return "Unauthorized";
+            case 403: return "Forbidden";
+            case 404: return "Not Found";
+            case 429: return "Too Many Requests";
+            case 500: return "Internal Server Error";
+            case 502: return "Bad Gateway";
+            case 503: return "Service Unavailable";
+            default: return "Unknown";
         }
     }
 
     private void sendError(Socket clientSocket, int code, String message) {
         try {
             OutputStream out = clientSocket.getOutputStream();
+            String body = "{\"error\": \"" + message + "\"}";
             String response = "HTTP/1.1 " + code + " " + message + "\r\n" +
                              "Content-Type: application/json\r\n" +
-                             "Content-Length: " + (message.length() + 30) + "\r\n" +
-                             "\r\n" +
-                             "{\"error\": \"" + message + "\"}";
+                             "Content-Length: " + body.length() + "\r\n" +
+                             "\r\n" + body;
             out.write(response.getBytes(StandardCharsets.UTF_8));
             out.flush();
         } catch (IOException ignored) {}
