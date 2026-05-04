@@ -22,78 +22,100 @@ public class ProxyServer extends NanoHTTPD {
 
     private LogCallback logCallback;
     private ProviderManager providerManager;
+    private int requestId = 0;
 
     public ProxyServer(int port) { super("127.0.0.1", port); }
     public void setLogCallback(LogCallback c) { this.logCallback = c; }
     public void setProviderManager(ProviderManager m) { this.providerManager = m; }
 
-    private void log(String msg) {
-        Log.d(TAG, msg);
-        if (logCallback != null) logCallback.onLog(msg);
+    private void log(int id, String msg) {
+        String line = "[#" + id + "] " + msg;
+        Log.d(TAG, line);
+        if (logCallback != null) logCallback.onLog(line);
     }
 
     @Override
     public Response serve(IHTTPSession session) {
+        int id = ++requestId;
         String uri = session.getUri();
         Method method = session.getMethod();
-        String clientIP = session.getRemoteIpAddress();
 
-        log("━━━ REQUEST ━━━");
-        log("From: " + clientIP);
-        log(method + " " + uri);
+        log(id, "━━━ " + method + " " + uri + " ━━━");
 
         try {
-            // Log request headers
-            StringJoiner hj = new StringJoiner(", ");
-            for (Map.Entry<String, String> h : session.getHeaders().entrySet()) {
-                String k = h.getKey();
-                String v = h.getValue();
-                // Mask sensitive headers
-                if (k.toLowerCase().contains("key") || k.toLowerCase().contains("auth") || k.toLowerCase().contains("cookie")) {
-                    v = v.length() > 8 ? v.substring(0, 4) + "****" : "****";
-                }
-                hj.add(k + ": " + v);
-            }
-            log("Headers: " + hj);
-
             // Parse body
             Map<String, String> bodyMap = new HashMap<>();
-            try { session.parseBody(bodyMap); } catch (Exception e) { log("Body parse: " + e.getMessage()); }
+            try { session.parseBody(bodyMap); } catch (Exception e) { log(id, "Body parse: " + e.getMessage()); }
             byte[] bodyBytes = new byte[0];
             String postData = bodyMap.get("postData");
             if (postData != null && !postData.isEmpty()) {
                 bodyBytes = postData.getBytes(StandardCharsets.UTF_8);
-                // Log body snippet (first 200 chars)
-                String bodyPreview = postData.length() > 200 ? postData.substring(0, 200) + "..." : postData;
-                log("Body (" + postData.length() + " chars): " + bodyPreview);
-            } else {
-                log("Body: (empty)");
+                String preview = postData.length() > 200 ? postData.substring(0, 200) + "..." : postData;
+                log(id, "Body (" + postData.length() + "): " + preview);
             }
 
             // Find provider
             ApiProvider provider = findProvider(uri);
             if (provider == null) {
-                log("✗ No provider with API Key configured");
-                log("━━━ END (no provider) ━━━");
+                log(id, "✗ No provider with API Key");
                 return newFixedLengthResponse(Response.Status.INTERNAL_ERROR, "application/json",
-                    "{\"error\":\"No API provider with Key configured. Open API Proxy app and add your API Key.\"}");
+                    "{\"error\":\"No API provider with Key. Open API Proxy app and add your Key.\"}");
             }
 
-            // Build target URL
+            // Smart path routing
+            String targetPath = smartRoute(uri, method, postData);
             String base = provider.getBaseUrl();
             while (base.endsWith("/")) base = base.substring(0, base.length() - 1);
-            String targetUrl = base + uri;
-            log("Provider: " + provider.getName() + " [" + provider.getId() + "]");
-            log("Target: " + targetUrl);
-            log("Key Header: " + provider.getKeyHeader() + ": " + provider.getMaskedApiKey());
+            String targetUrl = base + targetPath;
 
-            return forward(targetUrl, provider, session, bodyBytes);
+            log(id, "Provider: " + provider.getName());
+            log(id, "Route: " + uri + " -> " + targetPath);
+            log(id, "Target: " + targetUrl);
+
+            return forward(id, targetUrl, provider, session, bodyBytes);
         } catch (Exception e) {
-            log("✗ ERROR: " + e.getMessage());
-            log("━━━ END (error) ━━━");
+            log(id, "✗ " + e.getMessage());
             return newFixedLengthResponse(Response.Status.INTERNAL_ERROR, "application/json",
                 "{\"error\":\"" + e.getMessage().replace("\"", "'") + "\"}");
         }
+    }
+
+    /**
+     * Smart route: normalize paths for OpenAI-compatible APIs
+     * / -> /v1/chat/completions (if POST with chat body)
+     * /models -> /v1/models
+     * /chat/completions -> /v1/chat/completions
+     * /v1/* -> /v1/* (pass through)
+     * /gemini/* -> keep as-is for Gemini
+     * /anthropic/* -> keep as-is for Claude
+     */
+    private String smartRoute(String uri, Method method, String body) {
+        // Already has /v1 prefix - pass through
+        if (uri.startsWith("/v1/")) return uri;
+        
+        // Gemini API paths
+        if (uri.startsWith("/v1beta/") || uri.startsWith("/v1alpha/")) return uri;
+        
+        // /models -> /v1/models
+        if (uri.equals("/models")) return "/v1/models";
+        
+        // /chat/completions -> /v1/chat/completions
+        if (uri.equals("/chat/completions")) return "/v1/chat/completions";
+        
+        // POST to / with chat body -> /v1/chat/completions
+        if (method == Method.POST && (uri.equals("/") || uri.isEmpty())) {
+            if (body != null && (body.contains("\"messages\"") || body.contains("\"model\""))) {
+                return "/v1/chat/completions";
+            }
+        }
+        
+        // POST to / with other body - try /v1/chat/completions anyway
+        if (method == Method.POST && (uri.equals("/") || uri.isEmpty())) {
+            return "/v1/chat/completions";
+        }
+        
+        // Everything else - prefix with /v1
+        return "/v1" + uri;
     }
 
     private ApiProvider findProvider(String uri) {
@@ -104,7 +126,7 @@ public class ProxyServer extends NanoHTTPD {
         return null;
     }
 
-    private Response forward(String targetUrl, ApiProvider provider, IHTTPSession session, byte[] bodyBytes) {
+    private Response forward(int id, String targetUrl, ApiProvider provider, IHTTPSession session, byte[] bodyBytes) {
         HttpURLConnection conn = null;
         try {
             URL url = new URL(targetUrl);
@@ -115,32 +137,25 @@ public class ProxyServer extends NanoHTTPD {
             conn.setDoInput(true);
             conn.setInstanceFollowRedirects(true);
 
-            // Forward headers FIRST (excluding auth and host)
+            // Forward headers (strip auth, host, content-length)
             int headerCount = 0;
             for (Map.Entry<String, String> h : session.getHeaders().entrySet()) {
                 String k = h.getKey();
                 if (k == null) continue;
                 String lk = k.toLowerCase();
-                // Skip host, auth-related, content-length - we set these ourselves
-                if (!lk.equals("host") && 
-                    !lk.equals("content-length") &&
-                    !k.equalsIgnoreCase(provider.getKeyHeader()) &&
-                    !lk.contains("authorization") &&
-                    !lk.contains("x-api-key") &&
-                    !lk.contains("x-goog-api-key") &&
-                    !lk.contains("api-key")) {
+                if (!lk.equals("host") && !lk.equals("content-length") &&
+                    !lk.contains("authorization") && !lk.contains("x-api-key") &&
+                    !lk.contains("x-goog-api-key") && !lk.contains("api-key")) {
                     conn.setRequestProperty(k, h.getValue());
                     headerCount++;
                 }
             }
             
-            // Force correct Host based on target URL
+            // Force correct Host
             conn.setRequestProperty("Host", url.getHost());
             
-            // Inject API Key (AFTER other headers so it takes priority)
+            // Inject API Key
             conn.setRequestProperty(provider.getKeyHeader(), provider.getFullKeyValue());
-            
-            log("Forwarded " + headerCount + " headers + Host + API Key");
 
             // Write body
             if (bodyBytes.length > 0) {
@@ -153,31 +168,19 @@ public class ProxyServer extends NanoHTTPD {
                 out.write(bodyBytes);
                 out.flush();
                 out.close();
-                log("Sent " + bodyBytes.length + " bytes");
             }
 
-            log("Waiting for response...");
+            log(id, "Waiting...");
 
             int code = conn.getResponseCode();
             String respMsg = conn.getResponseMessage();
             InputStream is = code >= 400 ? conn.getErrorStream() : conn.getInputStream();
 
             if (is == null) {
-                log("← " + code + " " + respMsg + " (no body)");
-                log("━━━ END ━━━");
+                log(id, "← " + code + " " + respMsg + " (no body)");
                 Response.IStatus st = Response.Status.lookup(code);
                 return newFixedLengthResponse(st != null ? st : Response.Status.INTERNAL_ERROR,
                     "application/json", "{\"error\":\"empty response (" + code + ")\"}");
-            }
-
-            // Log response headers
-            String contentType = conn.getContentType();
-            if (contentType == null) contentType = "application/json";
-            log("Response Headers:");
-            for (Map.Entry<String, List<String>> entry : conn.getHeaderFields().entrySet()) {
-                if (entry.getKey() != null) {
-                    log("  " + entry.getKey() + ": " + String.join(", ", entry.getValue()));
-                }
             }
 
             // Buffer full response
@@ -188,12 +191,8 @@ public class ProxyServer extends NanoHTTPD {
             byte[] respBytes = bos.toByteArray();
             is.close();
 
-            // Log response body preview
-            String respPreview = "";
-            if (respBytes.length > 0 && contentType.contains("json") || contentType.contains("text")) {
-                String respStr = new String(respBytes, StandardCharsets.UTF_8);
-                respPreview = respStr.length() > 300 ? respStr.substring(0, 300) + "..." : respStr;
-            }
+            String contentType = conn.getContentType();
+            if (contentType == null) contentType = "application/json";
 
             Response.IStatus status = Response.Status.lookup(code);
             if (status == null) status = Response.Status.INTERNAL_ERROR;
@@ -201,7 +200,6 @@ public class ProxyServer extends NanoHTTPD {
             Response response = newFixedLengthResponse(status, contentType,
                 new ByteArrayInputStream(respBytes), respBytes.length);
 
-            // Copy response headers
             for (Map.Entry<String, List<String>> entry : conn.getHeaderFields().entrySet()) {
                 if (entry.getKey() != null &&
                     !entry.getKey().equalsIgnoreCase("Content-Length") &&
@@ -212,14 +210,20 @@ public class ProxyServer extends NanoHTTPD {
 
             conn.disconnect();
 
-            log("← " + code + " " + respMsg + " [" + respBytes.length + " bytes]");
-            if (!respPreview.isEmpty()) log("Body: " + respPreview);
-            log("━━━ END ━━━");
+            // Response preview
+            String respPreview = "";
+            if (respBytes.length > 0 && (contentType.contains("json") || contentType.contains("text"))) {
+                String rs = new String(respBytes, StandardCharsets.UTF_8);
+                respPreview = rs.length() > 300 ? rs.substring(0, 300) + "..." : rs;
+            }
+
+            log(id, "← " + code + " " + respMsg + " [" + respBytes.length + "B]");
+            if (!respPreview.isEmpty()) log(id, "Resp: " + respPreview);
+            log(id, "━━━ DONE ━━━");
             return response;
 
         } catch (IOException e) {
-            log("✗ FWD ERROR: " + e.getMessage());
-            log("━━━ END (io error) ━━━");
+            log(id, "✗ " + e.getMessage());
             if (conn != null) conn.disconnect();
             return newFixedLengthResponse(Response.Status.INTERNAL_ERROR, "application/json",
                 "{\"error\":\"" + e.getMessage().replace("\"", "'") + "\"}");
