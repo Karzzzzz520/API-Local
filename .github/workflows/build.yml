@@ -1,4 +1,4 @@
-name: Build Release APK
+name: Build APK
 
 on:
   push:
@@ -32,27 +32,27 @@ jobs:
           echo "sdk.dir=$ANDROID_HOME" > local.properties
           echo "sdk.dir=$ANDROID_HOME"
 
-      - name: Build Release APK
+      - name: Build APK
         run: |
           pwd
           ls -la
-          ./gradlew assembleRelease --no-daemon --stacktrace
+          ./gradlew assembleDebug --no-daemon --stacktrace
 
-      - name: Rename APK with version
+      - name: Rename Debug APK
         if: success()
         run: |
-          cd app/build/outputs/apk/release
-          if [ -f "app-release.apk" ]; then
+          cd app/build/outputs/apk/debug
+          if [ -f "app-debug.apk" ]; then
             APK_NAME="API-Proxy-$(date +%Y%m%d-%H%M%S).apk"
-            mv app-release.apk "$APK_NAME"
+            mv app-debug.apk "$APK_NAME"
             echo "APK_NAME=$APK_NAME" >> $GITHUB_ENV
             ls -la
           fi
 
-      - name: Upload Release APK
+      - name: Upload APK
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: API-Proxy-Release
-          path: app/build/outputs/apk/release/*.apk
+          name: API-Proxy-Debug
+          path: app/build/outputs/apk/debug/*.apk
           retention-days: 30
