@@ -18,7 +18,7 @@
             android:hint="@string/provider_name"
             style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
 
-            <AutoCompleteTextView
+            <com.google.android.material.textfield.MaterialAutoCompleteTextView
                 android:id="@+id/actv_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -34,7 +34,7 @@
             android:hint="@string/base_url"
             style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
 
-            <TextInputEditText
+            <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/et_base_url"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -51,7 +51,7 @@
             app:endIconMode="password_toggle"
             style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
 
-            <TextInputEditText
+            <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/et_api_key"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -67,7 +67,7 @@
             android:hint="@string/key_header"
             style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
 
-            <AutoCompleteTextView
+            <com.google.android.material.textfield.MaterialAutoCompleteTextView
                 android:id="@+id/actv_key_header"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -83,7 +83,7 @@
             android:hint="@string/key_prefix"
             style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
 
-            <TextInputEditText
+            <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/et_key_prefix"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -103,7 +103,6 @@
             android:id="@+id/spinner_key_type"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
             android:minHeight="48dp" />
 
     </LinearLayout>
