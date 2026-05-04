@@ -1,4 +1,5 @@
 package com.apiproxy.local;
+import java.io.IOException;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -12,9 +13,6 @@ import android.os.IBinder;
 import androidx.core.app.NotificationCompat;
 import android.util.Log;
 
-/**
- * 前台服务 - 管理代理服务生命周期
- */
 public class ProxyService extends Service {
     private static final String TAG = "ProxyService";
     private static final String CHANNEL_ID = "proxy_service_channel";
@@ -56,7 +54,7 @@ public class ProxyService extends Service {
     }
 
     private void startProxy() {
-        if (proxyServer != null && proxyServer.isRunning()) {
+        if (proxyServer != null && proxyServer.isAlive()) {
             Log.d(TAG, "Proxy already running");
             return;
         }
@@ -64,24 +62,23 @@ public class ProxyService extends Service {
         proxyServer = new ProxyServer(currentPort);
         proxyServer.setProviderManager(providerManager);
         
-        // 设置日志回调
         proxyServer.setLogCallback(message -> {
             Intent broadcast = new Intent(MainActivity.ACTION_LOG);
             broadcast.putExtra(MainActivity.EXTRA_LOG_MESSAGE, message);
             sendBroadcast(broadcast);
         });
 
-        if (proxyServer.start()) {
+        try {
+            proxyServer.start();
             Log.d(TAG, "Proxy started on port " + currentPort);
             updateNotification(true, currentPort);
             
-            // 发送状态广播
             Intent broadcast = new Intent(MainActivity.ACTION_PROXY_STATUS);
             broadcast.putExtra(MainActivity.EXTRA_PROXY_RUNNING, true);
             broadcast.putExtra(MainActivity.EXTRA_PORT, currentPort);
             sendBroadcast(broadcast);
-        } else {
-            Log.e(TAG, "Failed to start proxy");
+        } catch (IOException e) {
+            Log.e(TAG, "Failed to start proxy: " + e.getMessage());
             stopForeground(STOP_FOREGROUND_REMOVE);
             stopSelf();
         }
@@ -92,7 +89,6 @@ public class ProxyService extends Service {
             proxyServer.stop();
             proxyServer = null;
             
-            // 发送状态广播
             Intent broadcast = new Intent(MainActivity.ACTION_PROXY_STATUS);
             broadcast.putExtra(MainActivity.EXTRA_PROXY_RUNNING, false);
             sendBroadcast(broadcast);
@@ -102,7 +98,7 @@ public class ProxyService extends Service {
     }
 
     public boolean isProxyRunning() {
-        return proxyServer != null && proxyServer.isRunning();
+        return proxyServer != null && proxyServer.isAlive();
     }
 
     private void createNotificationChannel() {
@@ -133,7 +129,6 @@ public class ProxyService extends Service {
         
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, flags);
 
-        // 停止按钮
         Intent stopIntent = new Intent(this, ProxyService.class);
         stopIntent.setAction(ACTION_STOP);
         PendingIntent stopPendingIntent = PendingIntent.getService(this, 1, stopIntent, flags);
@@ -143,12 +138,10 @@ public class ProxyService extends Service {
         String text = running ? getString(R.string.notification_text_running, port) 
                               : getString(R.string.notification_text_stopped);
 
-        int icon = running ? R.drawable.ic_play : R.drawable.ic_stop;
-
         Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle(title)
             .setContentText(text)
-            .setSmallIcon(icon)
+            .setSmallIcon(R.drawable.ic_play)
             .setContentIntent(pendingIntent)
             .addAction(R.drawable.ic_stop, getString(R.string.stop), stopPendingIntent)
             .setOngoing(true)

@@ -10,8 +10,8 @@ android {
         applicationId "com.apiproxy.local"
         minSdk 26
         targetSdk 34
-        versionCode 5
-        versionName "1.0.4"
+        versionCode 6
+        versionName "1.1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -44,6 +44,10 @@ android {
     buildFeatures {
         viewBinding true
     }
+
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES'
+    }
 }
 
 dependencies {
@@ -54,4 +58,5 @@ dependencies {
     implementation libs.androidx.constraintlayout
     implementation libs.androidx.recyclerview
     implementation libs.gson
+    implementation 'org.nanohttpd:nanohttpd:2.3.1'
 }
