@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView recyclerProviders;
     private ProviderAdapter adapter;
     private TextView tvLogs;
-    private View logsContainer;
+    private View tvLogsHeader;
     
     private ProviderManager providerManager;
     private boolean isProxyRunning = false;
@@ -104,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
         etPort = findViewById(R.id.et_port);
         recyclerProviders = findViewById(R.id.recycler_providers);
         tvLogs = findViewById(R.id.tv_logs);
-        logsContainer = findViewById(R.id.logs_container);
+        tvLogsHeader = findViewById(R.id.tv_logs_header);
         FloatingActionButton fab = findViewById(R.id.fab_add);
 
         fab.setOnClickListener(v -> showAddProviderDialog(null));
@@ -171,10 +171,10 @@ public class MainActivity extends AppCompatActivity {
         // 日志区域点击展开/收起
         View tvLogsHeader = findViewById(R.id.tv_logs_header);
         tvLogsHeader.setOnClickListener(v -> {
-            if (logsContainer.getVisibility() == View.VISIBLE) {
-                logsContainer.setVisibility(View.GONE);
+            if (tvLogsHeader.getVisibility() == View.VISIBLE) {
+                tvLogsHeader.setVisibility(View.GONE);
             } else {
-                logsContainer.setVisibility(View.VISIBLE);
+                tvLogsHeader.setVisibility(View.VISIBLE);
             }
         });
     }
