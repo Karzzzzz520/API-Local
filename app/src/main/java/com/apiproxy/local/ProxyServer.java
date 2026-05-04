@@ -162,7 +162,7 @@ public class ProxyServer extends NanoHTTPD {
             
             if (responseStream == null) {
                 log("No response stream, code: " + responseCode);
-                return newFixedLengthResponse(Response.Status.BAD_GATEWAY,
+                return newFixedLengthResponse(Response.Status.INTERNAL_ERROR,
                     "application/json", "{\"error\":\"No response from upstream\"}");
             }
 
@@ -206,7 +206,7 @@ public class ProxyServer extends NanoHTTPD {
         } catch (IOException e) {
             log("Forward error: " + e.getMessage());
             if (conn != null) conn.disconnect();
-            return newFixedLengthResponse(Response.Status.BAD_GATEWAY,
+            return newFixedLengthResponse(Response.Status.INTERNAL_ERROR,
                 "application/json", "{\"error\":\"Proxy error: " + e.getMessage() + "\"}");
         }
     }
