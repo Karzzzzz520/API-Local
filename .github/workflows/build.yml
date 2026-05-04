@@ -23,30 +23,34 @@ jobs:
           java-version: 17
 
       - name: Make gradlew executable
-        run: chmod +x gradlew
-
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: 8.9
+        run: |
+          chmod +x ./gradlew
+          chmod +x ./gradlew.bat
 
       - name: Create local.properties
         run: |
           echo "sdk.dir=$ANDROID_HOME" > local.properties
+          echo "sdk.dir=$ANDROID_HOME"
 
       - name: Build Release APK
-        run: ./gradlew assembleRelease --no-daemon
+        run: |
+          pwd
+          ls -la
+          ./gradlew assembleRelease --no-daemon --stacktrace
 
       - name: Rename APK with version
+        if: success()
         run: |
           cd app/build/outputs/apk/release
           if [ -f "app-release.apk" ]; then
             APK_NAME="API-Proxy-$(date +%Y%m%d-%H%M%S).apk"
             mv app-release.apk "$APK_NAME"
             echo "APK_NAME=$APK_NAME" >> $GITHUB_ENV
+            ls -la
           fi
 
       - name: Upload Release APK
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: API-Proxy-Release
