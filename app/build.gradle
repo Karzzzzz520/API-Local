@@ -16,23 +16,10 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
-    signingConfigs {
-        debug {
-            storeFile file("${System.getProperty('user.home')}/.android/debug.keystore")
-            storePassword "android"
-            keyAlias "androiddebugkey"
-            keyPassword "android"
-        }
-    }
-
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.debug
-        }
-        debug {
-            signingConfig signingConfigs.debug
         }
     }
 
@@ -55,3 +42,4 @@ dependencies {
     implementation libs.androidx.recyclerview
     implementation libs.gson
 }
+
