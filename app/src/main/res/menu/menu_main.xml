@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    
+    <item
+        android:id="@+id/action_clear_logs"
+        android:title="@string/action_clear_logs"
+        android:icon="@drawable/ic_clear"
+        app:showAsAction="never" />
+    
+    <item
+        android:id="@+id/action_copy_url"
+        android:title="@string/action_copy_url"
+        android:icon="@drawable/ic_copy"
+        app:showAsAction="never" />
+    
+    <item
+        android:id="@+id/action_about"
+        android:title="@string/action_about"
+        android:icon="@drawable/ic_info"
+        app:showAsAction="never" />
+    
+</menu>

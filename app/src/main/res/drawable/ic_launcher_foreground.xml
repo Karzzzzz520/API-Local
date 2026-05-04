@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- API Proxy icon -->
+    <group android:scaleX="0.4"
+        android:scaleY="0.4"
+        android:translateX="32"
+        android:translateY="32">
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M54,27c-14.9,0 -27,12.1 -27,27s12.1,27 27,27 27,-12.1 27,-27 -12.1,-27 -27,-27zM54,75c-11.6,0 -21,-9.4 -21,-21s9.4,-21 21,-21 21,9.4 21,21 -9.4,21 -21,21z"/>
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M54,39c-8.3,0 -15,6.7 -15,15s6.7,15 15,15 15,-6.7 15,-15 -6.7,-15 -15,-15zM54,63c-5,0 -9,-4 -9,-9s4,-9 9,-9 9,4 9,9 -4,9 -9,9z"/>
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M66,42l12,12 -12,12"/>
+    </group>
+</vector>

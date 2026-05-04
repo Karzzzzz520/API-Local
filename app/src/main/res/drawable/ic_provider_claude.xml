@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="40dp"
+    android:height="40dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- Claude-style logo - stylized A -->
+    <path
+        android:fillColor="#CC785C"
+        android:pathData="M12,2L2,22h20L12,2z"/>
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M12,6l6.5,12h-13L12,6z"/>
+</vector>

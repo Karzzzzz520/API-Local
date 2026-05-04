@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="40dp"
+    android:height="40dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- OpenAI-style logo -->
+    <path
+        android:fillColor="#10A37F"
+        android:pathData="M22.282,9.821a5.985,5.985 0,0 0,-5.424 -4.3,5.046 5.046,0 0,0 -9.758,1.06 5,5 0,0 0,7.755 4.32,6.7 6.7,0 0,1 7.4,0.92Z"/>
+    <path
+        android:fillColor="#10A37F"
+        android:pathData="M19.988,12.513a5.034,5.034 0,0 1,-9.757 -1.08,5.059 5.059,0 0,1 9.763,1.065"/>
+    <path
+        android:fillColor="#10A37F"
+        android:pathData="M20.109,19.334a5.993,5.993 0,0 1,-7.948 0.4,6.7 6.7,0 0,0 7.948,0A5.006,5.006 0,0 1,20.109 19.334"/>
+</vector>

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">API Proxy</string>
+    
+    <!-- 状态 -->
+    <string name="status_running">代理运行中</string>
+    <string name="status_stopped">代理已停止</string>
+    <string name="status">状态</string>
+    
+    <!-- 端口配置 -->
+    <string name="port_config">代理端口</string>
+    <string name="port_hint">端口号 (默认 8080)</string>
+    <string name="invalid_port">请输入有效端口 (1-65535)</string>
+    
+    <!-- 服务商 -->
+    <string name="api_providers">API 服务商</string>
+    <string name="add_provider">添加服务商</string>
+    <string name="edit_provider">编辑服务商</string>
+    <string name="delete_provider">删除服务商</string>
+    <string name="delete_provider_confirm">确定要删除 %1$s 吗？</string>
+    <string name="provider_saved">保存成功</string>
+    <string name="provider_deleted">已删除</string>
+    <string name="not_configured">未配置</string>
+    <string name="provider_icon">服务商图标</string>
+    <string name="edit">编辑</string>
+    
+    <!-- 服务商配置 -->
+    <string name="provider_name">服务商名称</string>
+    <string name="base_url">Base URL</string>
+    <string name="api_key">API Key</string>
+    <string name="key_header">Key Header</string>
+    <string name="key_prefix">Key 前缀</string>
+    <string name="key_type">Key 类型</string>
+    
+    <!-- 按钮 -->
+    <string name="save">保存</string>
+    <string name="cancel">取消</string>
+    <string name="delete">删除</string>
+    <string name="ok">确定</string>
+    <string name="stop">停止</string>
+    
+    <!-- 菜单 -->
+    <string name="action_clear_logs">清除日志</string>
+    <string name="action_copy_url">复制代理地址</string>
+    <string name="action_about">关于</string>
+    
+    <!-- 日志 -->
+    <string name="logs">转发日志</string>
+    <string name="expand_logs">展开日志</string>
+    <string name="url_copied">代理地址已复制到剪贴板</string>
+    
+    <!-- 通知 -->
+    <string name="notification_channel_name">代理服务</string>
+    <string name="notification_channel_desc">显示代理服务运行状态</string>
+    <string name="notification_title_running">API Proxy 运行中</string>
+    <string name="notification_title_stopped">API Proxy 已停止</string>
+    <string name="notification_text_running">监听端口: %d</string>
+    <string name="notification_text_stopped">代理服务已停止</string>
+    
+    <!-- 表单验证 -->
+    <string name="fill_required_fields">请填写必填项</string>
+    
+    <!-- 权限 -->
+    <string name="permission_denied">权限被拒绝，无法启动服务</string>
+    
+    <!-- 关于 -->
+    <string name="about_message">API Proxy v1.0.0\n\n本地API Key代理转换工具\n\n功能：\n• 本地HTTP代理服务\n• 自动注入API Key\n• 支持SSE流式转发\n• 多API服务商配置\n\n使用方法：\n1. 配置API服务商和Key\n2. 开启代理开关\n3. 将客户端的API地址改为 http://localhost:端口</string>
+</resources>
