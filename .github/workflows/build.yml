@@ -34,21 +34,21 @@ jobs:
       - name: Rename APK
         run: |
           cd app/build/outputs/apk/debug
-          mv app-debug.apk API-Proxy-v1.0.0.apk
+          mv app-debug.apk API-Proxy-v1.0.1.apk
           ls -la
 
       - name: Upload APK as Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: API-Proxy-v1.0.0
-          path: app/build/outputs/apk/debug/API-Proxy-v1.0.0.apk
+          name: API-Proxy-v1.0.1
+          path: app/build/outputs/apk/debug/API-Proxy-v1.0.1.apk
           retention-days: 30
 
       - name: Create Release and Upload APK
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v1.0.0
-          name: API Proxy v1.0.0
+          tag_name: v1.0.1
+          name: API Proxy v1.0.1
           body: |
             ## API Proxy - 本地API Key代理转换工具
             
@@ -61,6 +61,6 @@ jobs:
             - 🎨 Material You 风格界面
             - ⚙️ 预设OpenAI/Gemini/Claude/DeepSeek配置
             - 📋 实时转发日志
-          files: app/build/outputs/apk/debug/API-Proxy-v1.0.0.apk
+          files: app/build/outputs/apk/debug/API-Proxy-v1.0.1.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
