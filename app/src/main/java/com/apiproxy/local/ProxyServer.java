@@ -2,6 +2,7 @@ package com.apiproxy.local;
 
 import android.util.Log;
 import fi.iki.elonen.NanoHTTPD;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,28 +17,18 @@ import java.util.Map;
 public class ProxyServer extends NanoHTTPD {
     private static final String TAG = "ProxyServer";
 
-    public interface LogCallback {
-        void onLog(String message);
-    }
+    public interface LogCallback { void onLog(String message); }
 
     private LogCallback logCallback;
     private ProviderManager providerManager;
 
-    public ProxyServer(int port) {
-        super("127.0.0.1", port);
-    }
+    public ProxyServer(int port) { super("127.0.0.1", port); }
+    public void setLogCallback(LogCallback c) { this.logCallback = c; }
+    public void setProviderManager(ProviderManager m) { this.providerManager = m; }
 
-    public void setLogCallback(LogCallback callback) {
-        this.logCallback = callback;
-    }
-
-    public void setProviderManager(ProviderManager manager) {
-        this.providerManager = manager;
-    }
-
-    private void log(String message) {
-        Log.d(TAG, message);
-        if (logCallback != null) logCallback.onLog(message);
+    private void log(String msg) {
+        Log.d(TAG, msg);
+        if (logCallback != null) logCallback.onLog(msg);
     }
 
     @Override
@@ -47,109 +38,44 @@ public class ProxyServer extends NanoHTTPD {
             Method method = session.getMethod();
             log(method + " " + uri);
 
-            // Read body properly
-            byte[] bodyBytes = readBody(session);
+            Map<String, String> bodyMap = new HashMap<>();
+            try { session.parseBody(bodyMap); } catch (Exception e) { log("body: " + e.getMessage()); }
+            byte[] bodyBytes = new byte[0];
+            String postData = bodyMap.get("postData");
+            if (postData != null && !postData.isEmpty()) bodyBytes = postData.getBytes(StandardCharsets.UTF_8);
 
-            // Find provider
             ApiProvider provider = findProvider(uri);
             if (provider == null) {
-                log("No provider with API Key configured");
-                return newFixedLengthResponse(Response.Status.INTERNAL_ERROR,
-                    "application/json", "{\"error\":\"No API provider configured. Add an API Key first.\"}");
+                return newFixedLengthResponse(Response.Status.INTERNAL_ERROR, "application/json",
+                    "{\"error\":\"No provider with API Key\"}");
             }
 
-            // Build target URL
             String targetUrl = provider.getBaseUrl() + uri;
             log("-> " + targetUrl);
 
-            // Forward
-            return forwardRequest(session, targetUrl, provider, bodyBytes);
-
+            return forward(targetUrl, provider, session, bodyBytes);
         } catch (Exception e) {
-            log("Error: " + e.getMessage());
-            return newFixedLengthResponse(Response.Status.INTERNAL_ERROR,
-                "application/json", "{\"error\":\"" + e.getMessage().replace("\"", "'") + "\"}");
+            log("ERR: " + e.getMessage());
+            return newFixedLengthResponse(Response.Status.INTERNAL_ERROR, "application/json",
+                "{\"error\":\"" + e.getMessage().replace("\"", "'") + "\"}");
         }
-    }
-
-    private byte[] readBody(IHTTPSession session) throws IOException {
-        // NanoHTTPD stores body in inputStream after parseBody
-        Map<String, String> bodyMap = new HashMap<>();
-        try {
-            session.parseBody(bodyMap);
-        } catch (Exception e) {
-            log("Parse body: " + e.getMessage());
-        }
-        
-        String postData = bodyMap.get("postData");
-        if (postData != null && !postData.isEmpty()) {
-            return postData.getBytes(StandardCharsets.UTF_8);
-        }
-        
-        // Fallback: read from content-length
-        long contentLen = getContentLength(session);
-        if (contentLen <= 0) return new byte[0];
-        
-        InputStream is = session.getInputStream();
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        byte[] buf = new byte[4096];
-        long remaining = contentLen;
-        while (remaining > 0) {
-            int toRead = (int) Math.min(buf.length, remaining);
-            int read = is.read(buf, 0, toRead);
-            if (read <= 0) break;
-            bos.write(buf, 0, read);
-            remaining -= read;
-        }
-        return bos.toByteArray();
-    }
-
-    private long getContentLength(IHTTPSession session) {
-        String cl = session.getHeaders().get("content-length");
-        if (cl == null) cl = session.getHeaders().get("Content-Length");
-        if (cl != null) {
-            try { return Long.parseLong(cl); } catch (NumberFormatException ignored) {}
-        }
-        return 0;
     }
 
     private ApiProvider findProvider(String uri) {
         if (providerManager == null) return null;
-
-        // Route by path prefix
-        if (uri.startsWith("/gemini/")) {
-            for (ApiProvider p : providerManager.getAllProviders()) {
-                if (p.hasApiKey() && p.getId().equals("gemini")) return p;
-            }
-        } else if (uri.startsWith("/claude/")) {
-            for (ApiProvider p : providerManager.getAllProviders()) {
-                if (p.hasApiKey() && p.getId().equals("claude")) return p;
-            }
-        } else if (uri.startsWith("/deepseek/")) {
-            for (ApiProvider p : providerManager.getAllProviders()) {
-                if (p.hasApiKey() && p.getId().equals("deepseek")) return p;
-            }
-        } else if (uri.startsWith("/openai/")) {
-            for (ApiProvider p : providerManager.getAllProviders()) {
-                if (p.hasApiKey() && p.getId().equals("openai")) return p;
-            }
-        }
-
-        // Default: first provider with key
         for (ApiProvider p : providerManager.getAllProviders()) {
             if (p.hasApiKey()) return p;
         }
         return null;
     }
 
-    private Response forwardRequest(IHTTPSession session, String targetUrl,
-                                     ApiProvider provider, byte[] bodyBytes) {
+    private Response forward(String targetUrl, ApiProvider provider, IHTTPSession session, byte[] bodyBytes) {
         HttpURLConnection conn = null;
         try {
             URL url = new URL(targetUrl);
             conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod(session.getMethod().name());
-            conn.setConnectTimeout(30000);
+            conn.setConnectTimeout(15000);
             conn.setReadTimeout(120000);
             conn.setDoInput(true);
             conn.setInstanceFollowRedirects(true);
@@ -157,78 +83,72 @@ public class ProxyServer extends NanoHTTPD {
             // Inject API Key
             conn.setRequestProperty(provider.getKeyHeader(), provider.getFullKeyValue());
 
-            // Forward all headers
-            for (Map.Entry<String, String> header : session.getHeaders().entrySet()) {
-                String key = header.getKey();
-                if (key == null) continue;
-                String lowerKey = key.toLowerCase();
-                if (!lowerKey.equals("host") &&
-                    !key.equalsIgnoreCase(provider.getKeyHeader()) &&
-                    !lowerKey.equals("content-length")) {
-                    conn.setRequestProperty(key, header.getValue());
+            // Forward headers
+            for (Map.Entry<String, String> h : session.getHeaders().entrySet()) {
+                String k = h.getKey();
+                if (k == null) continue;
+                String lk = k.toLowerCase();
+                if (!lk.equals("host") && !k.equalsIgnoreCase(provider.getKeyHeader()) && !lk.equals("content-length")) {
+                    conn.setRequestProperty(k, h.getValue());
                 }
             }
 
             // Write body
-            if (bodyBytes != null && bodyBytes.length > 0) {
+            if (bodyBytes.length > 0) {
                 conn.setDoOutput(true);
-                conn.setRequestProperty("Content-Length", String.valueOf(bodyBytes.length));
-                // Ensure content-type is set
-                if (conn.getRequestProperty("Content-Type") == null &&
-                    conn.getRequestProperty("content-type") == null) {
+                if (conn.getRequestProperty("Content-Type") == null) {
                     conn.setRequestProperty("Content-Type", "application/json");
                 }
+                conn.setRequestProperty("Content-Length", String.valueOf(bodyBytes.length));
                 OutputStream out = conn.getOutputStream();
                 out.write(bodyBytes);
                 out.flush();
                 out.close();
             }
 
-            // Read response
             int code = conn.getResponseCode();
             InputStream is = code >= 400 ? conn.getErrorStream() : conn.getInputStream();
             if (is == null) {
-                log("No response, code=" + code);
-                return newFixedLengthResponse(Response.Status.INTERNAL_ERROR,
-                    "application/json", "{\"error\":\"Empty response from upstream\"}");
+                log("<- " + code + " (no body)");
+                return newFixedLengthResponse(Response.Status.lookup(code) != null ? Response.Status.lookup(code) : Response.Status.INTERNAL_ERROR,
+                    "application/json", "{\"error\":\"empty response\"}");
             }
+
+            // Read FULL response into buffer (reliable, no stream hanging)
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            byte[] buf = new byte[8192];
+            int read;
+            while ((read = is.read(buf)) != -1) { bos.write(buf, 0, read); }
+            byte[] respBytes = bos.toByteArray();
+            is.close();
 
             String contentType = conn.getContentType();
             if (contentType == null) contentType = "application/json";
 
-            boolean streaming = contentType.contains("text/event-stream");
-
-            // Build response status
             Response.IStatus status = Response.Status.lookup(code);
             if (status == null) status = Response.Status.INTERNAL_ERROR;
 
-            Response response;
-            int contentLen = conn.getContentLength();
-            if (streaming || contentLen <= 0) {
-                response = newChunkedResponse(status, contentType, is);
-            } else {
-                response = newFixedLengthResponse(status, contentType, is, contentLen);
-            }
+            Response response = newFixedLengthResponse(status, contentType,
+                new ByteArrayInputStream(respBytes), respBytes.length);
 
             // Copy response headers
             for (Map.Entry<String, List<String>> entry : conn.getHeaderFields().entrySet()) {
                 if (entry.getKey() != null &&
                     !entry.getKey().equalsIgnoreCase("Content-Length") &&
                     !entry.getKey().equalsIgnoreCase("Transfer-Encoding")) {
-                    for (String val : entry.getValue()) {
-                        response.addHeader(entry.getKey(), val);
-                    }
+                    for (String v : entry.getValue()) response.addHeader(entry.getKey(), v);
                 }
             }
 
-            log("<- " + code);
+            conn.disconnect();
+            log("<- " + code + " (" + respBytes.length + " bytes)");
             return response;
 
         } catch (IOException e) {
-            log("Forward error: " + e.getMessage());
+            log("FWD ERR: " + e.getMessage());
             if (conn != null) conn.disconnect();
-            return newFixedLengthResponse(Response.Status.INTERNAL_ERROR,
-                "application/json", "{\"error\":\"" + e.getMessage().replace("\"", "'") + "\"}");
+            return newFixedLengthResponse(Response.Status.INTERNAL_ERROR, "application/json",
+                "{\"error\":\"" + e.getMessage().replace("\"", "'") + "\"}");
         }
     }
 }

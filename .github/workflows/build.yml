@@ -40,23 +40,23 @@ jobs:
       - name: Rename APK
         run: |
           cd app/build/outputs/apk/release
-          mv app-release.apk API-Proxy-v1.1.1.apk
+          mv app-release.apk API-Proxy-v1.1.2.apk
           ls -la
 
       - name: Upload APK as Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: API-Proxy-v1.1.1
-          path: app/build/outputs/apk/release/API-Proxy-v1.1.1.apk
+          name: API-Proxy-v1.1.2
+          path: app/build/outputs/apk/release/API-Proxy-v1.1.2.apk
           retention-days: 30
 
       - name: Create Release and Upload APK
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v1.1.1
-          name: API Proxy v1.1.1
+          tag_name: v1.1.2
+          name: API Proxy v1.1.2
           body: |
-            ## API Proxy v1.1.1 - NanoHTTPD重写版
+            ## API Proxy v1.1.2 - NanoHTTPD重写版
             
             ### 重大改进
             - 🔄 用NanoHTTPD替换手写ServerSocket，HTTP解析稳定
@@ -70,6 +70,6 @@ jobs:
             1. 添加API服务商和Key
             2. 开启代理
             3. 其他APP设置Base URL为 `http://localhost:8080`
-          files: app/build/outputs/apk/release/API-Proxy-v1.1.1.apk
+          files: app/build/outputs/apk/release/API-Proxy-v1.1.2.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
