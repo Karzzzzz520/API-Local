@@ -50,7 +50,9 @@ public class ProxyServer extends NanoHTTPD {
                     "{\"error\":\"No provider with API Key\"}");
             }
 
-            String targetUrl = provider.getBaseUrl() + uri;
+            String base = provider.getBaseUrl();
+            while (base.endsWith("/")) base = base.substring(0, base.length() - 1);
+            String targetUrl = base + uri;
             log("-> " + targetUrl);
 
             return forward(targetUrl, provider, session, bodyBytes);
