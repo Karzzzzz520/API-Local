@@ -26,7 +26,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.switchmaterial.SwitchMaterial;
+import com.google.android.material.materialswitch.MaterialSwitch;
 import com.google.android.material.textfield.TextInputEditText;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
     public static final String EXTRA_PORT = "port";
     public static final String EXTRA_LOG_MESSAGE = "message";
 
-    private SwitchMaterial switchProxy;
+    private MaterialSwitch switchProxy;
     private EditText etPort;
     private RecyclerView recyclerProviders;
     private ProviderAdapter adapter;
