@@ -1,12 +1,16 @@
 #!/bin/sh
 
+##############################################################################
 #
-# Gradle start up script for POSIX
+#   Gradle start up script for POSIX
 #
+##############################################################################
 
 # Attempt to set APP_HOME
+# Resolve links: $0 may be a link
 app_path=$0
 
+# Need this for daisy-chained symlinks.
 while
     APP_HOME=${app_path%"${app_path##*/}"}
     [ -h "$app_path" ]
@@ -21,8 +25,6 @@ done
 
 APP_BASE_NAME=${0##*/}
 APP_HOME=$( cd "${APP_HOME:-./}" > /dev/null && pwd -P ) || exit
-
-CLASSPATH=$APP_HOME/gradle/wrapper/gradle-wrapper.jar
 
 # Determine the Java command to use to start the JVM.
 if [ -n "$JAVA_HOME" ] ; then
@@ -44,10 +46,16 @@ else
     fi
 fi
 
+CLASSPATH=$APP_HOME/gradle/wrapper/gradle-wrapper.jar
+
+# Add default JVM options here.
 DEFAULT_JVM_OPTS='"-Xmx64m" "-Xms64m"'
 
-exec "$JAVACMD" $DEFAULT_JVM_OPTS $JAVA_OPTS $GRADLE_OPTS \
-    "-Dorg.gradle.appname=$APP_BASE_NAME" \
-    -classpath "$CLASSPATH" \
-    org.gradle.wrapper.GradleWrapperMain \
-    "$@"
+exec "$JAVACMD" \
+  $DEFAULT_JVM_OPTS \
+  $JAVA_OPTS \
+  $GRADLE_OPTS \
+  "-Dorg.gradle.appname=$APP_BASE_NAME" \
+  -classpath "$CLASSPATH" \
+  org.gradle.wrapper.GradleWrapperMain \
+  "$@"
