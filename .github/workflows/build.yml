@@ -1,4 +1,4 @@
-name: Build APK
+name: Build & Release APK
 
 on:
   push:
@@ -23,36 +23,41 @@ jobs:
           java-version: 17
 
       - name: Make gradlew executable
-        run: |
-          chmod +x ./gradlew
-          chmod +x ./gradlew.bat
+        run: chmod +x ./gradlew
 
-      - name: Create local.properties
-        run: |
-          echo "sdk.dir=$ANDROID_HOME" > local.properties
-          echo "sdk.dir=$ANDROID_HOME"
+      - name: Build Debug APK
+        run: ./gradlew assembleDebug --no-daemon
 
-      - name: Build APK
-        run: |
-          pwd
-          ls -la
-          ./gradlew assembleDebug --no-daemon --stacktrace
-
-      - name: Rename Debug APK
-        if: success()
+      - name: Rename APK
         run: |
           cd app/build/outputs/apk/debug
-          if [ -f "app-debug.apk" ]; then
-            APK_NAME="API-Proxy-$(date +%Y%m%d-%H%M%S).apk"
-            mv app-debug.apk "$APK_NAME"
-            echo "APK_NAME=$APK_NAME" >> $GITHUB_ENV
-            ls -la
-          fi
+          mv app-debug.apk API-Proxy-v1.0.0.apk
+          ls -la
 
-      - name: Upload APK
-        if: success()
+      - name: Upload APK as Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: API-Proxy-Debug
-          path: app/build/outputs/apk/debug/*.apk
+          name: API-Proxy-v1.0.0
+          path: app/build/outputs/apk/debug/API-Proxy-v1.0.0.apk
           retention-days: 30
+
+      - name: Create Release and Upload APK
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.0
+          name: API Proxy v1.0.0
+          body: |
+            ## API Proxy - 本地API Key代理转换工具
+            
+            在手机上运行HTTP代理服务，将请求转发到OpenAI/Gemini/Claude/DeepSeek等API，自动注入API Key。
+            
+            ### 功能
+            - 🔄 本地HTTP代理服务器
+            - 🔑 自动注入API Key
+            - 📡 支持SSE流式转发
+            - 🎨 Material You 风格界面
+            - ⚙️ 预设OpenAI/Gemini/Claude/DeepSeek配置
+            - 📋 实时转发日志
+          files: app/build/outputs/apk/debug/API-Proxy-v1.0.0.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
