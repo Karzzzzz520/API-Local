@@ -1,0 +1,63 @@
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.13/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+> Task :apiproxy:preBuild UP-TO-DATE
+> Task :apiproxy:preDebugBuild UP-TO-DATE
+> Task :apiproxy:mergeDebugNativeDebugMetadata NO-SOURCE
+> Task :apiproxy:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :apiproxy:dataBindingMergeDependencyArtifactsDebug
+> Task :apiproxy:generateDebugResValues
+> Task :apiproxy:generateDebugResources
+> Task :apiproxy:packageDebugResources
+> Task :apiproxy:parseDebugLocalResources
+> Task :apiproxy:mapDebugSourceSetPaths
+> Task :apiproxy:checkDebugAarMetadata
+> Task :apiproxy:createDebugCompatibleScreenManifests
+> Task :apiproxy:extractDeepLinksDebug
+> Task :apiproxy:mergeDebugResources
+> Task :apiproxy:processDebugMainManifest
+> Task :apiproxy:dataBindingGenBaseClassesDebug
+> Task :apiproxy:processDebugManifest
+> Task :apiproxy:javaPreCompileDebug
+> Task :apiproxy:mergeDebugShaders
+> Task :apiproxy:compileDebugShaders NO-SOURCE
+> Task :apiproxy:generateDebugAssets UP-TO-DATE
+> Task :apiproxy:mergeDebugAssets
+> Task :apiproxy:compressDebugAssets
+> Task :apiproxy:desugarDebugFileDependencies
+> Task :apiproxy:mergeDebugJniLibFolders
+> Task :apiproxy:checkDebugDuplicateClasses
+> Task :apiproxy:mergeDebugNativeLibs NO-SOURCE
+> Task :apiproxy:processDebugManifestForPackage
+> Task :apiproxy:stripDebugDebugSymbols NO-SOURCE
+> Task :apiproxy:mergeLibDexDebug
+> Task :apiproxy:validateSigningDebug
+AAPT2 aapt2-8.7.3-12006047-linux Daemon #0: Unexpected error output: /root/.gradle/caches/8.13/transforms/d854507ab65581a6e067a6a64adcd3d5/transformed/aapt2-8.7.3-12006047-linux/aapt2: line 3: exec: qemu-x86_64-static: not found
+> Task :apiproxy:processDebugResources FAILED
+> Task :apiproxy:writeDebugAppMetadata
+> Task :apiproxy:l8DexDesugarLibDebug
+> Task :apiproxy:mergeExtDexDebug
+
+[Incubating] Problems report is available at: file:///data/user/0/com.ai.assistance.operit/files/workspace/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':apiproxy:processDebugResources'.
+> A failure occurred while executing com.android.build.gradle.internal.res.LinkApplicationAndroidResourcesTask$TaskAction
+   > AAPT2 aapt2-8.7.3-12006047-linux Daemon #0: Daemon startup failed
+     This should not happen under normal circumstances, please file an issue if it does.
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.13/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD FAILED in 1m 33s
+27 actionable tasks: 27 executed

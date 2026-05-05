@@ -1,0 +1,14 @@
+[
+    {
+        "merged": "com.apiproxy.local.apiproxy-mergeDebugResources-3:/layout/item_provider.xml",
+        "source": "com.apiproxy.local.apiproxy-main-6:/layout/item_provider.xml"
+    },
+    {
+        "merged": "com.apiproxy.local.apiproxy-mergeDebugResources-3:/layout/activity_main.xml",
+        "source": "com.apiproxy.local.apiproxy-main-6:/layout/activity_main.xml"
+    },
+    {
+        "merged": "com.apiproxy.local.apiproxy-mergeDebugResources-3:/layout/dialog_add_provider.xml",
+        "source": "com.apiproxy.local.apiproxy-main-6:/layout/dialog_add_provider.xml"
+    }
+]
