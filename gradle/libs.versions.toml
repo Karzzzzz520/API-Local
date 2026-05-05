@@ -1,7 +1,6 @@
 [versions]
-agp = "8.7.3"
+agp = "8.5.2"
 kotlin = "2.1.0"
-mt-plugin = "3.0.0"
 desugar-jdk-libs = "2.1.4"
 
 [libraries]
@@ -11,4 +10,3 @@ desugar-jdk-libs = { group = "com.android.tools", name = "desugar_jdk_libs", ver
 android-application = { id = "com.android.application", version.ref = "agp" }
 android-library = { id = "com.android.library", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-mt-plugin = { id = "bin.mt.plugin", version.ref = "mt-plugin" }
