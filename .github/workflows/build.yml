@@ -33,30 +33,29 @@ jobs:
         
     - name: Grant execute permission
       run: chmod +x gradlew
-      working-directory: ./apiproxy
       
     - name: Build Debug APK
-      run: cd apiproxy && ./gradlew assembleDebug --no-daemon --stacktrace
+      run: ./gradlew assembleDebug --no-daemon --stacktrace
       
     - name: Build Release APK
-      run: cd apiproxy && ./gradlew assembleRelease --no-daemon --stacktrace
+      run: ./gradlew assembleRelease --no-daemon --stacktrace
       
     - name: Upload Debug APK
       uses: actions/upload-artifact@v4
       with:
         name: debug-apk
-        path: apiproxy/build/outputs/apk/debug/*.apk
+        path: build/outputs/apk/debug/*.apk
         
     - name: Upload Release APK
       uses: actions/upload-artifact@v4
       with:
         name: release-apk
-        path: apiproxy/build/outputs/apk/release/*.apk
+        path: build/outputs/apk/release/*.apk
         
     - name: Get version
       id: version
       run: |
-        VERSION=$(grep versionName apiproxy/build.gradle | head -1 | sed 's/.*"\(.*\)".*/\1/')
+        VERSION=$(grep versionName build.gradle | head -1 | sed 's/.*"\(.*\)".*/\1/')
         echo "version=$VERSION" >> $GITHUB_OUTPUT
       
     - name: Create Release
@@ -66,8 +65,8 @@ jobs:
         tag_name: ${{ steps.version.outputs.version }}
         name: API-Local ${{ steps.version.outputs.version }}
         files: |
-          apiproxy/build/outputs/apk/release/*.apk
-          apiproxy/build/outputs/apk/debug/*.apk
+          build/outputs/apk/release/*.apk
+          build/outputs/apk/debug/*.apk
         draft: false
         prerelease: false
       env:
