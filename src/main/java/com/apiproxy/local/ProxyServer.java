@@ -210,7 +210,12 @@ public class ProxyServer {
 
     @SuppressWarnings("deprecation")
     private String forwardRequest(String method, String targetUrl, String apiKey, String body, String originalRequest) throws IOException {
-        URL url = new URI(targetUrl).toURL();
+        URL url;
+        try {
+            url = new URI(targetUrl).toURL();
+        } catch (java.net.URISyntaxException e) {
+            throw new IOException("Invalid URI: " + targetUrl, e);
+        }
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setConnectTimeout(30000);
         conn.setReadTimeout(60000);
@@ -223,7 +228,12 @@ public class ProxyServer {
                 // Gemini: API Key 作为 query parameter
                 String separator = targetUrl.contains("?") ? "&" : "?";
                 String urlStr = targetUrl + separator + "key=" + apiKey;
-                URL newUrl = new URI(urlStr).toURL();
+                URL newUrl;
+                try {
+                    newUrl = new URI(urlStr).toURL();
+                } catch (java.net.URISyntaxException e) {
+                    throw new IOException("Invalid URI: " + urlStr, e);
+                }
                 conn.disconnect();
                 conn = (HttpURLConnection) newUrl.openConnection();
                 conn.setConnectTimeout(30000);

@@ -301,12 +301,12 @@ public class MainActivity extends androidx.appcompat.app.AppCompatActivity {
             btnToggleServer.setText(R.string.stop_server);
             btnToggleServer.setIconResource(R.drawable.ic_stop);
             btnToggleServer.setBackgroundTintList(ColorStateList.valueOf(
-                    getColor(com.google.android.material.R.color.material_dynamic_tertiary20)));
+                    android.graphics.Color.parseColor("#4CAF50")));
             tvStatus.setText(R.string.server_running);
-            tvStatus.setTextColor(getColor(com.google.android.material.R.color.material_dynamic_primary40));
+            tvStatus.setTextColor(android.graphics.Color.parseColor("#4CAF50"));
 
             GradientDrawable drawable = (GradientDrawable) statusDot.getBackground();
-            drawable.setColor(getColor(com.google.android.material.R.color.material_dynamic_primary40));
+            drawable.setColor(android.graphics.Color.parseColor("#4CAF50"));
             statusDot.setBackground(drawable);
 
             tvEndpoint.setVisibility(View.VISIBLE);
@@ -317,12 +317,12 @@ public class MainActivity extends androidx.appcompat.app.AppCompatActivity {
             btnToggleServer.setText(R.string.start_server);
             btnToggleServer.setIconResource(R.drawable.ic_play);
             btnToggleServer.setBackgroundTintList(ColorStateList.valueOf(
-                    getColor(com.google.android.material.R.color.material_dynamic_primary60)));
+                    getColor(android.R.color.holo_green_dark)));
             tvStatus.setText(R.string.server_stopped);
-            tvStatus.setTextColor(getColor(com.google.android.material.R.color.material_dynamic_neutral40));
+            tvStatus.setTextColor(android.graphics.Color.parseColor("#757575"));
 
             GradientDrawable drawable = (GradientDrawable) statusDot.getBackground();
-            drawable.setColor(getColor(com.google.android.material.R.color.material_dynamic_error30));
+            drawable.setColor(android.graphics.Color.parseColor("#F44336"));
             statusDot.setBackground(drawable);
 
             tvEndpoint.setVisibility(View.GONE);
