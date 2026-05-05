@@ -295,7 +295,6 @@ public class MainActivity extends androidx.appcompat.app.AppCompatActivity {
 
         Toast.makeText(this, "正在启动代理服务器...", Toast.LENGTH_SHORT).show();
     }
-    }
 
     private void updateServerUI(boolean running) {
         if (running) {
