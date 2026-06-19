@@ -34,4 +34,15 @@
     <string name="clear_log">清空日志</string>
     <string name="copy_endpoint">复制端点</string>
     <string name="endpoint_copied">已复制到剪贴板</string>
+    
+    <string name="settings">设置</string>
+    <string name="settings_appearance">外观</string>
+    <string name="settings_language">语言</string>
+    <string name="settings_theme">主题</string>
+    <string name="settings_dynamic_colors">动态取色</string>
+    <string name="settings_dynamic_colors_summary">使用 Material You 动态颜色 (Android 12+)</string>
+    <string name="settings_ui_style">UI 风格</string>
+    <string name="settings_about">关于</string>
+    <string name="settings_github_summary">查看源代码</string>
+    <string name="settings_version">版本</string>
 </resources>
