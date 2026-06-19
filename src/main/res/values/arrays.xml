@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Language entries -->
+    <string-array name="language_entries">
+        <item>中文</item>
+        <item>English</item>
+        <item>日本語</item>
+    </string-array>
+    <string-array name="language_values">
+        <item>zh</item>
+        <item>en</item>
+        <item>ja</item>
+    </string-array>
+
+    <!-- Theme mode entries -->
+    <string-array name="theme_entries">
+        <item>系统主题</item>
+        <item>日间模式</item>
+        <item>夜间模式</item>
+    </string-array>
+    <string-array name="theme_values">
+        <item>-1</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+    <!-- UI Style entries -->
+    <string-array name="ui_style_entries">
+        <item>Material You (动态取色)</item>
+        <item>Material Design 3</item>
+        <item>Miuix (小米风格)</item>
+    </string-array>
+    <string-array name="ui_style_values">
+        <item>material_you</item>
+        <item>md3</item>
+        <item>miuix</item>
+    </string-array>
+</resources>
