@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory
+        android:title="@string/settings_appearance">
+
+        <ListPreference
+            android:key="language"
+            android:title="@string/settings_language"
+            android:entries="@array/language_entries"
+            android:entryValues="@array/language_values"
+            android:defaultValue="zh"
+            app:icon="@drawable/ic_language" />
+
+        <ListPreference
+            android:key="theme_mode"
+            android:title="@string/settings_theme"
+            android:entries="@array/theme_entries"
+            android:entryValues="@array/theme_values"
+            android:defaultValue="0"
+            app:icon="@drawable/ic_theme" />
+
+        <SwitchPreferenceCompat
+            android:key="dynamic_colors"
+            android:title="@string/settings_dynamic_colors"
+            android:summary="@string/settings_dynamic_colors_summary"
+            android:defaultValue="true"
+            app:icon="@drawable/ic_palette" />
+
+        <ListPreference
+            android:key="ui_style"
+            android:title="@string/settings_ui_style"
+            android:entries="@array/ui_style_entries"
+            android:entryValues="@array/ui_style_values"
+            android:defaultValue="md3"
+            app:icon="@drawable/ic_style" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/settings_about">
+
+        <Preference
+            android:key="github_link"
+            android:title="GitHub"
+            android:summary="@string/settings_github_summary"
+            app:icon="@drawable/ic_github" />
+
+        <Preference
+            android:key="version"
+            android:title="@string/settings_version"
+            app:icon="@drawable/ic_info" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>
