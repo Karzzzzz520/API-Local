@@ -29,6 +29,11 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".SettingsActivity"
+            android:exported="false"
+            android:theme="@style/Theme.APIProxy" />
+
         <service
             android:name=".ProxyService"
             android:foregroundServiceType="dataSync"
