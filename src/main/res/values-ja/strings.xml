@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">API プロキシ</string>
+    <string name="start_server">プロキシ開始</string>
+    <string name="stop_server">プロキシ停止</string>
+    <string name="server_running">プロキシ実行中</string>
+    <string name="server_stopped">プロキシ停止済み</string>
+    <string name="port_number">ポート番号</string>
+    <string name="add_provider">プロバイダー追加</string>
+    <string name="provider_name">プロバイダー名</string>
+    <string name="api_key">APIキー</string>
+    <string name="base_url">API URL</string>
+    <string name="save">保存</string>
+    <string name="cancel">キャンセル</string>
+    <string name="delete">削除</string>
+    <string name="local_endpoint">ローカルエンドポイント</string>
+    <string name="status_enabled">有効</string>
+    <string name="status_disabled">無効</string>
+    <string name="no_providers">APIプロバイダーなし\n+をタップして追加</string>
+    <string name="provider_openai">OpenAI</string>
+    <string name="provider_gemini">Gemini</string>
+    <string name="provider_claude">Claude</string>
+    <string name="provider_deepseek">DeepSeek</string>
+    <string name="provider_custom">カスタム</string>
+    <string name="url_openai">https://api.openai.com</string>
+    <string name="url_gemini">https://generativelanguage.googleapis.com</string>
+    <string name="url_claude">https://api.anthropic.com</string>
+    <string name="url_deepseek">https://api.deepseek.com</string>
+    <string name="notification_channel_name">API プロキシサービス</string>
+    <string name="notification_channel_desc">プロキシサービス通知</string>
+    <string name="notification_text">API プロキシが localhost:%d で実行中</string>
+    <string name="hint_port">例: 8080</string>
+    <string name="server_log">ログ</string>
+    <string name="clear_log">ログ消去</string>
+    <string name="copy_endpoint">エンドポイントコピー</string>
+    <string name="endpoint_copied">クリップボードにコピーしました</string>
+    
+    <string name="settings">設定</string>
+    <string name="settings_appearance">外観</string>
+    <string name="settings_language">言語</string>
+    <string name="settings_theme">テーマ</string>
+    <string name="settings_dynamic_colors">ダイナミックカラー</string>
+    <string name="settings_dynamic_colors_summary">Material You ダイナミックカラーを使用 (Android 12+)</string>
+    <string name="settings_ui_style">UIスタイル</string>
+    <string name="settings_about">について</string>
+    <string name="settings_github_summary">ソースコードを見る</string>
+    <string name="settings_version">バージョン</string>
+</resources>
