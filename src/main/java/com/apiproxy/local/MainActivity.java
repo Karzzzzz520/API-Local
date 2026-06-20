@@ -75,10 +75,8 @@ public class MainActivity extends androidx.appcompat.app.AppCompatActivity {
     private final ActivityResultLauncher<String> notificationPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), granted -> {
                 if (granted) {
-                    // 权限已授予，重新触发启动
                     startProxyServer();
                 } else {
-                    // 权限被拒绝，仍然尝试启动
                     startProxyServer();
                 }
             });
@@ -100,12 +98,10 @@ public class MainActivity extends androidx.appcompat.app.AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        // 启用 Material You 动态取色 (Android 12+)
         DynamicColors.applyToActivityIfAvailable(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // 设置沉浸式状态栏
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Window window = getWindow();
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
@@ -131,20 +127,15 @@ public class MainActivity extends androidx.appcompat.app.AppCompatActivity {
         recyclerProviders = findViewById(R.id.recyclerProviders);
         fabAddProvider = findViewById(R.id.fabAddProvider);
 
-        // Toolbar
         com.google.android.material.appbar.MaterialToolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayShowTitleEnabled(true);
         }
 
-        // 服务器开关按钮
         btnToggleServer.setOnClickListener(v -> toggleServer());
-
-        // 添加服务商 FAB
         fabAddProvider.setOnClickListener(v -> showAddProviderDialog(null));
 
-        // RecyclerView 设置
         recyclerProviders.setLayoutManager(new LinearLayoutManager(this));
         adapter = new ProviderAdapter(this, providers, getPort(), new ProviderAdapter.OnProviderListener() {
             @Override
@@ -153,7 +144,6 @@ public class MainActivity extends androidx.appcompat.app.AppCompatActivity {
                 saveProviders();
                 updateProviderCount();
                 if (serviceBound && proxyService.isProxyRunning()) {
-                    // 如果服务器在运行，需要重启以应用更改
                     restartServer();
                 }
             }
@@ -170,7 +160,6 @@ public class MainActivity extends androidx.appcompat.app.AppCompatActivity {
         });
         recyclerProviders.setAdapter(adapter);
 
-        // 默认端口
         SharedPreferences prefs = getSharedPreferences("apiproxy", MODE_PRIVATE);
         etPort.setText(String.valueOf(prefs.getInt("port", 8080)));
 
@@ -196,7 +185,6 @@ public class MainActivity extends androidx.appcompat.app.AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        // 不在这里解绑，因为服务可能仍在运行
     }
 
     @Override
@@ -217,14 +205,8 @@ public class MainActivity extends androidx.appcompat.app.AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
-        if (id == R.id.action_clear_log) {
-            Toast.makeText(this, "日志已清空", Toast.LENGTH_SHORT).show();
-            return true;
-        } else if (id == R.id.action_settings) {
+        if (id == R.id.action_settings) {
             startActivity(new Intent(this, SettingsActivity.class));
-            return true;
-        } else if (id == R.id.action_info) {
-            showInfoDialog();
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -240,12 +222,10 @@ public class MainActivity extends androidx.appcompat.app.AppCompatActivity {
 
     private void toggleServer() {
         if (serviceBound && proxyService != null && proxyService.isProxyRunning()) {
-            // 停止服务器
             proxyService.stopProxy();
             updateServerUI(false);
             Toast.makeText(this, "代理服务器已停止", Toast.LENGTH_SHORT).show();
         } else {
-            // 安卓13+ 需要运行时请求通知权限
             if (Build.VERSION.SDK_INT >= 33) {
                 notificationPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS);
             } else {
@@ -254,7 +234,6 @@ public class MainActivity extends androidx.appcompat.app.AppCompatActivity {
         }
     }
 
-    // 提取启动逻辑，给权限回调复用
     private void startProxyServer() {
         int port = getPort();
         if (port < 1024 || port > 65535) {
@@ -262,13 +241,11 @@ public class MainActivity extends androidx.appcompat.app.AppCompatActivity {
             return;
         }
 
-        // 保存端口
         getSharedPreferences("apiproxy", MODE_PRIVATE)
                 .edit()
                 .putInt("port", port)
                 .apply();
 
-        // 检查是否有启用的服务商
         boolean hasEnabled = false;
         for (ApiProvider p : providers) {
             if (p.isEnabled() && p.getApiKey() != null && !p.getApiKey().isEmpty()) {
@@ -283,11 +260,9 @@ public class MainActivity extends androidx.appcompat.app.AppCompatActivity {
             return;
         }
 
-        // 启动代理服务
         Intent serviceIntent = new Intent(this, ProxyService.class);
         ContextCompat.startForegroundService(this, serviceIntent);
 
-        // 绑定并启动
         mainHandler.postDelayed(() -> {
             if (serviceBound && proxyService != null) {
                 proxyService.startProxy(port, providers,
@@ -332,7 +307,6 @@ public class MainActivity extends androidx.appcompat.app.AppCompatActivity {
             etPort.setEnabled(true);
         }
 
-        // 更新适配器中的端口
         adapter.notifyDataSetChanged();
     }
 
@@ -346,7 +320,6 @@ public class MainActivity extends androidx.appcompat.app.AppCompatActivity {
     }
 
     private void logToUI(String msg) {
-        // 日志显示在 Snackbar（轻量）
         if (msg.startsWith("❌") || msg.startsWith("⚠️")) {
             Snackbar.make(findViewById(android.R.id.content), msg, Snackbar.LENGTH_SHORT).show();
         }
@@ -375,7 +348,6 @@ public class MainActivity extends androidx.appcompat.app.AppCompatActivity {
         builder.setView(dialogView);
         AlertDialog dialog = builder.create();
 
-        // 如果要编辑，设置标题
         if (isEdit) {
             dialog.setTitle("编辑服务商");
         }
@@ -415,7 +387,6 @@ public class MainActivity extends androidx.appcompat.app.AppCompatActivity {
             updateProviderCount();
             dialog.dismiss();
 
-            // 如果服务器运行中，重启
             if (serviceBound && proxyService != null && proxyService.isProxyRunning()) {
                 restartServer();
             }
@@ -479,7 +450,6 @@ public class MainActivity extends androidx.appcompat.app.AppCompatActivity {
                 }
             }
         } catch (Exception e) {
-            // 加载失败，使用默认
         }
         updateProviderCount();
     }
