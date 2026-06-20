@@ -6,7 +6,6 @@
         android:id="@+id/action_settings"
         android:title="@string/settings"
         android:icon="@drawable/ic_info"
-        android:iconPadding="12dp"
         android:showAsAction="always"
         app:actionLayout="@layout/menu_action_settings" />
 
