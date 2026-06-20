@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory android:title="@string/cli_accounts_title">
+
+        <ListPreference
+            android:key="cli_provider"
+            android:title="@string/cli_account_provider"
+            android:entries="@array/cli_provider_entries"
+            android:entryValues="@array/cli_provider_values"
+            android:defaultValue="gpt"
+            app:icon="@drawable/ic_provider" />
+
+        <ListPreference
+            android:key="cli_login_type"
+            android:title="@string/cli_account_login_type"
+            android:entries="@array/cli_login_type_entries"
+            android:entryValues="@array/cli_login_type_values"
+            android:defaultValue="api_key"
+            app:icon="@drawable/ic_info" />
+
+        <EditTextPreference
+            android:key="cli_account_name"
+            android:title="@string/cli_account_name"
+            android:defaultValue=""
+            app:icon="@drawable/ic_language" />
+
+        <EditTextPreference
+            android:key="cli_base_url"
+            android:title="@string/cli_account_base_url"
+            android:defaultValue=""
+            app:icon="@drawable/ic_copy" />
+
+        <EditTextPreference
+            android:key="cli_api_key"
+            android:title="@string/cli_account_api_key"
+            android:defaultValue=""
+            app:icon="@drawable/ic_clear" />
+
+        <EditTextPreference
+            android:key="cli_email"
+            android:title="@string/cli_account_email"
+            android:defaultValue=""
+            app:icon="@drawable/ic_github" />
+
+        <EditTextPreference
+            android:key="cli_token"
+            android:title="@string/cli_account_token"
+            android:defaultValue=""
+            app:icon="@drawable/ic_info" />
+
+        <Preference
+            android:key="cli_save"
+            android:title="@string/save"
+            android:summary="保存当前 CLI 账号配置"
+            app:icon="@drawable/ic_add" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>
