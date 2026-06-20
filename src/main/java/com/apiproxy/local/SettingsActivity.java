@@ -54,7 +54,6 @@ public class SettingsActivity extends AppCompatActivity {
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             setPreferencesFromResource(R.xml.preferences, rootKey);
 
-            // Language preference
             ListPreference languagePref = findPreference("language");
             if (languagePref != null) {
                 languagePref.setOnPreferenceChangeListener((preference, newValue) -> {
@@ -64,7 +63,6 @@ public class SettingsActivity extends AppCompatActivity {
                 });
             }
 
-            // Theme mode preference
             ListPreference themePref = findPreference("theme_mode");
             if (themePref != null) {
                 themePref.setOnPreferenceChangeListener((preference, newValue) -> {
@@ -74,7 +72,6 @@ public class SettingsActivity extends AppCompatActivity {
                 });
             }
 
-            // Dynamic colors preference
             SwitchPreferenceCompat dynamicPref = findPreference("dynamic_colors");
             if (dynamicPref != null) {
                 dynamicPref.setOnPreferenceChangeListener((preference, newValue) -> {
@@ -83,7 +80,6 @@ public class SettingsActivity extends AppCompatActivity {
                 });
             }
 
-            // GitHub link
             Preference githubPref = findPreference("github_link");
             if (githubPref != null) {
                 githubPref.setOnPreferenceClickListener(preference -> {
@@ -96,7 +92,6 @@ public class SettingsActivity extends AppCompatActivity {
                 });
             }
 
-            // Version info
             Preference versionPref = findPreference("version");
             if (versionPref != null) {
                 try {
