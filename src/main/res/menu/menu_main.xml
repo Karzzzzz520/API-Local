@@ -1,17 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <item
-        android:id="@+id/action_clear_log"
-        android:icon="@drawable/ic_clear"
-        android:title="@string/clear_log"
-        app:showAsAction="never" />
+
     <item
         android:id="@+id/action_settings"
         android:title="@string/settings"
-        app:showAsAction="never" />
-    <item
-        android:id="@+id/action_info"
-        android:title="关于"
-        app:showAsAction="never" />
+        android:icon="@drawable/ic_info"
+        android:iconPadding="12dp"
+        android:showAsAction="always"
+        app:actionLayout="@layout/menu_action_settings" />
+
 </menu>
