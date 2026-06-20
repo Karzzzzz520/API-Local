@@ -7,6 +7,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
 
@@ -147,7 +148,7 @@ public class CliAccountsActivity extends AppCompatActivity {
                     .setView(view)
                     .setCancelable(true);
 
-            android.app.AlertDialog dialog = builder.create();
+            AlertDialog dialog = builder.create();
             dialog.show();
 
             cancelButton.setOnClickListener(v -> dialog.dismiss());
@@ -155,8 +156,8 @@ public class CliAccountsActivity extends AppCompatActivity {
                 String name = safeText(nameField);
                 String baseUrl = safeText(baseUrlField);
                 String apiKey = safeText(apiKeyField);
-                String provider = safeText(providerField);
-                String loginType = safeText(loginTypeField);
+                String provider = opSafeText(providerField);
+                String loginType = opSafeText(loginTypeField);
 
                 if (name.isEmpty()) {
                     nameField.setError("请输入名称");
@@ -181,6 +182,10 @@ public class CliAccountsActivity extends AppCompatActivity {
 
         private String safeText(TextInputEditText editText) {
             return editText.getText() == null ? "" : editText.getText().toString().trim();
+        }
+
+        private String opSafeText(MaterialAutoCompleteTextView view) {
+            return view.getText() == null ? "" : view.getText().toString().trim();
         }
     }
 }
