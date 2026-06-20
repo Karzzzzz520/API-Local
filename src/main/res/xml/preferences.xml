@@ -39,6 +39,17 @@
     </PreferenceCategory>
 
     <PreferenceCategory
+        android:title="@string/settings_cli">
+
+        <Preference
+            android:key="cli_accounts"
+            android:title="@string/settings_cli_accounts"
+            android:summary="@string/settings_cli_accounts_summary"
+            app:icon="@drawable/ic_provider" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
         android:title="@string/settings_about">
 
         <Preference
