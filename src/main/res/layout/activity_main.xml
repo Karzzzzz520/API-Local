@@ -12,6 +12,7 @@
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorSurface"
         android:elevation="0dp"
+        android:paddingEnd="4dp"
         app:title="@string/app_name"
         app:titleTextAppearance="@style/TextAppearance.Material3.HeadlineSmall"
         app:menu="@menu/menu_main" />
@@ -91,7 +92,7 @@
                                 android:layout_height="56dp"
                                 android:text="@string/start_server"
                                 style="@style/Widget.Material3.Button"
-                app:icon="@drawable/ic_play"
+                                app:icon="@drawable/ic_play"
                                 app:iconGravity="textStart" />
 
                         </LinearLayout>
