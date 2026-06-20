@@ -1,5 +1,6 @@
 package com.apiproxy.local;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -83,11 +84,15 @@ public class SettingsActivity extends AppCompatActivity {
             Preference githubPref = findPreference("github_link");
             if (githubPref != null) {
                 githubPref.setOnPreferenceClickListener(preference -> {
-                    android.content.Intent intent = new android.content.Intent(
-                            android.content.Intent.ACTION_VIEW,
-                            android.net.Uri.parse("https://github.com/Karzzzzz520/API-Local")
-                    );
-                    startActivity(intent);
+                    startActivity(new Intent(Intent.ACTION_VIEW, android.net.Uri.parse("https://github.com/Karzzzzz520/API-Local")));
+                    return true;
+                });
+            }
+
+            Preference cliAccountsPref = findPreference("cli_accounts");
+            if (cliAccountsPref != null) {
+                cliAccountsPref.setOnPreferenceClickListener(preference -> {
+                    startActivity(new Intent(requireContext(), CliAccountsActivity.class));
                     return true;
                 });
             }
