@@ -220,6 +220,9 @@ public class MainActivity extends androidx.appcompat.app.AppCompatActivity {
         if (id == R.id.action_clear_log) {
             Toast.makeText(this, "日志已清空", Toast.LENGTH_SHORT).show();
             return true;
+        } else if (id == R.id.action_settings) {
+            startActivity(new Intent(this, SettingsActivity.class));
+            return true;
         } else if (id == R.id.action_info) {
             showInfoDialog();
             return true;
