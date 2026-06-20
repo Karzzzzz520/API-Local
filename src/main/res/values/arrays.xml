@@ -35,4 +35,30 @@
         <item>md3</item>
         <item>miuix</item>
     </string-array>
+
+    <!-- CLI provider entries -->
+    <string-array name="cli_provider_entries">
+        <item>GPT</item>
+        <item>Gemini</item>
+        <item>Claude</item>
+        <item>自定义</item>
+    </string-array>
+    <string-array name="cli_provider_values">
+        <item>gpt</item>
+        <item>gemini</item>
+        <item>claude</item>
+        <item>custom</item>
+    </string-array>
+
+    <!-- CLI login type entries -->
+    <string-array name="cli_login_type_entries">
+        <item>API Key 登录</item>
+        <item>账号登录</item>
+        <item>Token 登录</item>
+    </string-array>
+    <string-array name="cli_login_type_values">
+        <item>api_key</item>
+        <item>account</item>
+        <item>token</item>
+    </string-array>
 </resources>
