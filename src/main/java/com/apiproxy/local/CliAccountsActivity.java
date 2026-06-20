@@ -114,9 +114,10 @@ public class CliAccountsActivity extends AppCompatActivity {
             MaterialButton cancelButton = view.findViewById(R.id.btnCancel);
             MaterialButton saveButton = view.findViewById(R.id.btnSave);
 
+            // 只保留 GPT / Gemini / Claude 的账号登录
             MaterialAutoCompleteTextView providerField = new MaterialAutoCompleteTextView(requireContext());
             providerField.setHint(R.string.cli_account_provider);
-            providerField.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, new String[]{"GPT", "Gemini", "Claude", "DeepSeek", "Custom"}));
+            providerField.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, new String[]{"GPT", "Gemini", "Claude", "Custom"}));
 
             MaterialAutoCompleteTextView loginTypeField = new MaterialAutoCompleteTextView(requireContext());
             loginTypeField.setHint(R.string.cli_account_login_type);
