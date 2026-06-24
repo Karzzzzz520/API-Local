@@ -25,6 +25,7 @@ import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.preference.PreferenceManager;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -263,9 +264,21 @@ public class MainActivity extends androidx.appcompat.app.AppCompatActivity {
         Intent serviceIntent = new Intent(this, ProxyService.class);
         ContextCompat.startForegroundService(this, serviceIntent);
 
+        // Merge CLI accounts into provider list for this session
+        List<ApiProvider> allProviders = new ArrayList<>(providers);
+        List<ApiProvider> cliProviders = loadCliProviders();
+        for (ApiProvider cp : cliProviders) {
+            boolean exists = false;
+            for (ApiProvider p : allProviders) {
+                if (p.getName().equals(cp.getName())) { exists = true; break; }
+            }
+            if (!exists) allProviders.add(cp);
+        }
+
+        final List<ApiProvider> finalProviders = allProviders;
         mainHandler.postDelayed(() -> {
             if (serviceBound && proxyService != null) {
-                proxyService.startProxy(port, providers,
+                proxyService.startProxy(port, finalProviders,
                         msg -> runOnUiThread(() -> logToUI(msg)),
                         running -> runOnUiThread(() -> updateServerUI(running)));
             }
@@ -313,7 +326,16 @@ public class MainActivity extends androidx.appcompat.app.AppCompatActivity {
     private void restartServer() {
         if (serviceBound && proxyService != null && proxyService.isProxyRunning()) {
             int port = getPort();
-            proxyService.startProxy(port, providers,
+            List<ApiProvider> allProviders = new ArrayList<>(providers);
+            List<ApiProvider> cliProviders = loadCliProviders();
+            for (ApiProvider cp : cliProviders) {
+                boolean exists = false;
+                for (ApiProvider p : allProviders) {
+                    if (p.getName().equals(cp.getName())) { exists = true; break; }
+                }
+                if (!exists) allProviders.add(cp);
+            }
+            proxyService.startProxy(port, allProviders,
                     msg -> runOnUiThread(() -> logToUI(msg)),
                     running -> runOnUiThread(() -> updateServerUI(running)));
         }
@@ -465,6 +487,22 @@ public class MainActivity extends androidx.appcompat.app.AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private List<ApiProvider> loadCliProviders() {
+        List<ApiProvider> cliProviders = new ArrayList<>();
+        try {
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+            String jsonStr = prefs.getString("cli_accounts", "[]");
+            JSONArray array = new JSONArray(jsonStr);
+            for (int i = 0; i < array.length(); i++) {
+                CliAccount account = CliAccount.fromJson(array.getJSONObject(i));
+                if (account != null && account.isEnabled()) {
+                    cliProviders.add(account.toApiProvider());
+                }
+            }
+        } catch (Exception ignored) {}
+        return cliProviders;
     }
 
     private void updateProviderCount() {
