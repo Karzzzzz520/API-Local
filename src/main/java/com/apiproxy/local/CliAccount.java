@@ -1,8 +1,6 @@
 package com.apiproxy.local;
-
 import org.json.JSONException;
 import org.json.JSONObject;
-
 public class CliAccount {
     private String id;
     private String name;
@@ -13,7 +11,6 @@ public class CliAccount {
     private String email;
     private String token;
     private boolean enabled;
-
     public CliAccount(String id, String name, String provider, String loginType, String baseUrl, String apiKey, String email, String token, boolean enabled) {
         this.id = id;
         this.name = name;
@@ -25,7 +22,6 @@ public class CliAccount {
         this.token = token == null ? "" : token;
         this.enabled = enabled;
     }
-
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
     public String getName() { return name; }
@@ -44,15 +40,24 @@ public class CliAccount {
     public void setToken(String token) { this.token = token == null ? "" : token; }
     public boolean isEnabled() { return enabled; }
     public void setEnabled(boolean enabled) { this.enabled = enabled; }
-
     public String getMaskedSecret() {
         String secret = !apiKey.isEmpty() ? apiKey : token;
-        if (secret == null || secret.length() < 8) {
-            return "***";
-        }
+        if (secret == null || secret.length() < 8) return "***";
         return secret.substring(0, 4) + "..." + secret.substring(secret.length() - 4);
     }
-
+    public ApiProvider toApiProvider() {
+        String effectiveKey = !apiKey.isEmpty() ? apiKey : token;
+        String effectiveUrl = baseUrl;
+        if (effectiveUrl.isEmpty()) {
+            switch (provider.toLowerCase()) {
+                case "gpt": effectiveUrl = "https://api.openai.com"; break;
+                case "gemini": effectiveUrl = "https://generativelanguage.googleapis.com"; break;
+                case "claude": effectiveUrl = "https://api.anthropic.com"; break;
+                default: effectiveUrl = ""; break;
+            }
+        }
+        return new ApiProvider(id, name, effectiveUrl, effectiveKey, enabled);
+    }
     public JSONObject toJson() {
         try {
             JSONObject json = new JSONObject();
@@ -70,7 +75,6 @@ public class CliAccount {
             return new JSONObject();
         }
     }
-
     public static CliAccount fromJson(JSONObject json) {
         try {
             return new CliAccount(
