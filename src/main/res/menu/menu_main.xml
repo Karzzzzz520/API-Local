@@ -2,10 +2,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/action_html_loader"
-        android:title="HTML 加载器"
-        android:showAsAction="never" />
-    <item
         android:id="@+id/action_settings"
         android:title="@string/settings"
         android:showAsAction="never" />
