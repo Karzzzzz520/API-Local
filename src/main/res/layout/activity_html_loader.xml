@@ -18,12 +18,19 @@
             android:layout_width="0dp"
             android:layout_height="40dp"
             android:layout_weight="1"
-            android:hint="URL / HTML path / raw HTML"
+            android:hint="URL / sandbox path / raw HTML"
             android:inputType="textUri"
             android:singleLine="true"
             android:textSize="14sp"
             android:paddingLeft="12dp"
             android:paddingRight="12dp" />
+
+        <Button
+            android:id="@+id/btn_import"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_marginLeft="8dp"
+            android:text="Import" />
 
         <Button
             android:id="@+id/btn_load"
@@ -41,7 +48,7 @@
         android:paddingLeft="12dp"
         android:paddingRight="12dp"
         android:background="#EEEEEE"
-        android:text="Ready"
+        android:text="Sandbox ready"
         android:textSize="12sp"
         android:textColor="#666666"
         android:singleLine="true"
