@@ -16,10 +16,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-/**
- * 轻量级 HTTP 代理服务器
- * 监听 localhost:port，将请求转发到对应 API 服务商
- */
 public class ProxyServer {
 
     public interface LogCallback {
@@ -43,40 +39,28 @@ public class ProxyServer {
         this.providers = providers;
     }
 
-    public void setLogCallback(LogCallback callback) {
-        this.logCallback = callback;
-    }
-
-    public void setStatusCallback(StatusCallback callback) {
-        this.statusCallback = callback;
-    }
+    public void setLogCallback(LogCallback callback) { this.logCallback = callback; }
+    public void setStatusCallback(StatusCallback callback) { this.statusCallback = callback; }
 
     private void log(String msg) {
         if (logCallback != null) logCallback.onLog(msg);
     }
 
-    public boolean isRunning() {
-        return running.get();
-    }
+    public boolean isRunning() { return running.get(); }
 
     public void start() throws IOException {
         if (running.get()) return;
-
         serverSocket = new ServerSocket(port, 50, java.net.InetAddress.getByName("127.0.0.1"));
         running.set(true);
-
         if (statusCallback != null) statusCallback.onStatusChanged(true);
         log("🚀 代理服务器已启动，监听端口: " + port);
-
         threadPool.submit(() -> {
             while (running.get() && !serverSocket.isClosed()) {
                 try {
                     Socket client = serverSocket.accept();
                     threadPool.submit(() -> handleClient(client));
                 } catch (IOException e) {
-                    if (running.get()) {
-                        log("❌ 接受连接错误: " + e.getMessage());
-                    }
+                    if (running.get()) log("❌ 接受连接错误: " + e.getMessage());
                 }
             }
         });
@@ -85,53 +69,35 @@ public class ProxyServer {
     public void stop() {
         running.set(false);
         try {
-            if (serverSocket != null && !serverSocket.isClosed()) {
-                serverSocket.close();
-            }
+            if (serverSocket != null && !serverSocket.isClosed()) serverSocket.close();
         } catch (IOException e) {
             log("⚠️ 关闭服务器错误: " + e.getMessage());
         }
-
         if (statusCallback != null) statusCallback.onStatusChanged(false);
         log("🛑 代理服务器已停止");
     }
 
     private void handleClient(Socket client) {
-        try (
-                InputStream in = client.getInputStream();
-                OutputStream out = client.getOutputStream()
-        ) {
-            // 读取 HTTP 请求
+        try (InputStream in = client.getInputStream(); OutputStream out = client.getOutputStream()) {
             String request = readHttpRequest(in);
-            if (request == null || request.isEmpty()) {
-                sendError(out, 400, "Bad Request");
-                return;
-            }
+            if (request == null || request.isEmpty()) { sendError(out, 400, "Bad Request"); return; }
 
-            // 解析请求行
             String[] lines = request.split("\r\n");
             String[] requestLine = lines[0].split(" ");
-            if (requestLine.length < 3) {
-                sendError(out, 400, "Bad Request");
-                return;
-            }
+            if (requestLine.length < 3) { sendError(out, 400, "Bad Request"); return; }
 
             String method = requestLine[0];
             String path = requestLine[1];
-
             log("📥 " + method + " " + path);
 
-            // 健康检查端点
             if (path.equals("/health") || path.equals("/")) {
                 String body = "{\"status\":\"running\",\"port\":" + port + ",\"providers\":" + getActiveProvidersCount() + "}";
                 sendJsonResponse(out, 200, body);
                 return;
             }
 
-            // 查找匹配的服务商
             ApiProvider matchedProvider = null;
             String remainingPath = null;
-
             for (ApiProvider provider : providers) {
                 if (!provider.isEnabled()) continue;
                 String prefix = provider.getPathPrefix();
@@ -144,38 +110,27 @@ public class ProxyServer {
             }
 
             if (matchedProvider == null) {
-                sendError(out, 404, "No matching API provider found for path: " + path + 
-                        ". Available: " + getAvailablePaths());
+                sendError(out, 404, "No matching API provider found for path: " + path + ". Available: " + getAvailablePaths());
                 return;
             }
 
-            // 读取请求体
             String body = "";
             int bodyStart = request.indexOf("\r\n\r\n");
-            if (bodyStart > 0) {
-                body = request.substring(bodyStart + 4);
-            }
+            if (bodyStart > 0) body = request.substring(bodyStart + 4);
 
-            // 转发请求
             String targetUrl = matchedProvider.getBaseUrl() + remainingPath;
             log("➡️ 转发到: " + matchedProvider.getName() + " -> " + targetUrl);
 
-            String response = forwardRequest(method, targetUrl, matchedProvider.getApiKey(), body, request);
-
+            String response = forwardRequest(method, targetUrl, matchedProvider, body, request);
             out.write(response.getBytes(StandardCharsets.UTF_8));
             out.flush();
-
             log("✅ " + matchedProvider.getName() + " 响应已返回");
 
         } catch (Exception e) {
             log("❌ 处理请求错误: " + e.getMessage());
-            try {
-                sendError(client.getOutputStream(), 500, "Internal Server Error: " + e.getMessage());
-            } catch (IOException ignored) {}
+            try { sendError(client.getOutputStream(), 500, "Internal Server Error: " + e.getMessage()); } catch (IOException ignored) {}
         } finally {
-            try {
-                client.close();
-            } catch (IOException ignored) {}
+            try { client.close(); } catch (IOException ignored) {}
         }
     }
 
@@ -185,31 +140,22 @@ public class ProxyServer {
         String line;
         int contentLength = 0;
         boolean headerEnd = false;
-
         while ((line = reader.readLine()) != null) {
             request.append(line).append("\r\n");
-            if (line.toLowerCase().startsWith("content-length:")) {
+            if (line.toLowerCase().startsWith("content-length:"))
                 contentLength = Integer.parseInt(line.substring(15).trim());
-            }
-            if (line.isEmpty()) {
-                headerEnd = true;
-                break;
-            }
+            if (line.isEmpty()) { headerEnd = true; break; }
         }
-
         if (headerEnd && contentLength > 0) {
             char[] body = new char[contentLength];
             int read = reader.read(body, 0, contentLength);
-            if (read > 0) {
-                request.append(body, 0, read);
-            }
+            if (read > 0) request.append(body, 0, read);
         }
-
         return request.toString();
     }
 
     @SuppressWarnings("deprecation")
-    private String forwardRequest(String method, String targetUrl, String apiKey, String body, String originalRequest) throws IOException {
+    private String forwardRequest(String method, String targetUrl, ApiProvider provider, String body, String originalRequest) throws IOException {
         URL url;
         try {
             url = new URI(targetUrl).toURL();
@@ -222,10 +168,22 @@ public class ProxyServer {
         conn.setRequestMethod(method);
         conn.setDoInput(true);
 
-        // 设置认证头
+        // Set auth headers based on loginType
+        String apiKey = provider.getApiKey();
+        String loginType = provider.getLoginType();
+        String email = provider.getEmail();
+
         if (apiKey != null && !apiKey.isEmpty()) {
-            if (targetUrl.contains("generativelanguage.googleapis.com")) {
-                // Gemini: API Key 作为 query parameter
+            if ("email".equals(loginType) && email != null && !email.isEmpty()) {
+                // CLI email login: add email as header alongside auth
+                if (targetUrl.contains("anthropic.com")) {
+                    conn.setRequestProperty("x-api-key", apiKey);
+                    conn.setRequestProperty("anthropic-version", "2023-06-01");
+                } else {
+                    conn.setRequestProperty("Authorization", "Bearer " + apiKey);
+                }
+            } else if (targetUrl.contains("generativelanguage.googleapis.com")) {
+                // Gemini: API Key as query param
                 String separator = targetUrl.contains("?") ? "&" : "?";
                 String urlStr = targetUrl + separator + "key=" + apiKey;
                 URL newUrl;
@@ -241,24 +199,18 @@ public class ProxyServer {
                 conn.setRequestMethod(method);
                 conn.setDoInput(true);
             } else if (targetUrl.contains("anthropic.com")) {
-                // Claude: x-api-key header
                 conn.setRequestProperty("x-api-key", apiKey);
                 conn.setRequestProperty("anthropic-version", "2023-06-01");
             } else {
-                // OpenAI 及其他: Bearer token
                 conn.setRequestProperty("Authorization", "Bearer " + apiKey);
             }
         }
 
-        // 设置 Content-Type
         conn.setRequestProperty("Content-Type", "application/json");
-
-        // 设置 Host
         try {
             conn.setRequestProperty("Host", new URI(targetUrl).getHost());
         } catch (Exception ignored) {}
 
-        // 发送请求体
         if (!body.isEmpty() && (method.equals("POST") || method.equals("PUT") || method.equals("PATCH"))) {
             conn.setDoOutput(true);
             try (OutputStream os = conn.getOutputStream()) {
@@ -267,24 +219,16 @@ public class ProxyServer {
             }
         }
 
-        // 读取响应
         int responseCode = conn.getResponseCode();
         StringBuilder responseBody = new StringBuilder();
-
         try (BufferedReader br = new BufferedReader(
-                new InputStreamReader(
-                        responseCode >= 400 ? conn.getErrorStream() : conn.getInputStream(),
-                        StandardCharsets.UTF_8
-                ))) {
+                new InputStreamReader(responseCode >= 400 ? conn.getErrorStream() : conn.getInputStream(), StandardCharsets.UTF_8))) {
             String responseLine;
-            while ((responseLine = br.readLine()) != null) {
-                responseBody.append(responseLine);
-            }
+            while ((responseLine = br.readLine()) != null) responseBody.append(responseLine);
         } catch (Exception e) {
             responseBody.append("{\"error\":\"").append(e.getMessage()).append("\"}");
         }
 
-        // 构建 HTTP 响应
         return buildHttpResponse(responseCode, responseBody.toString());
     }
 
@@ -301,7 +245,6 @@ public class ProxyServer {
             case 500: statusText = "Internal Server Error"; break;
             default: statusText = "Unknown"; break;
         }
-
         return "HTTP/1.1 " + statusCode + " " + statusText + "\r\n" +
                 "Content-Type: application/json; charset=utf-8\r\n" +
                 "Access-Control-Allow-Origin: *\r\n" +
@@ -319,8 +262,7 @@ public class ProxyServer {
     }
 
     private void sendError(OutputStream out, int code, String message) throws IOException {
-        String body = "{\"error\":\"" + message + "\"}";
-        sendJsonResponse(out, code, body);
+        sendJsonResponse(out, code, "{\"error\":\"" + message + "\"}");
     }
 
     private int getActiveProvidersCount() {
