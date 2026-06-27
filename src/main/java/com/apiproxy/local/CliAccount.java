@@ -56,7 +56,7 @@ public class CliAccount {
                 default: effectiveUrl = ""; break;
             }
         }
-        return new ApiProvider(id, name, effectiveUrl, effectiveKey, enabled);
+        return new ApiProvider(id, name, effectiveUrl, effectiveKey, loginType, email, enabled);
     }
     public JSONObject toJson() {
         try {
