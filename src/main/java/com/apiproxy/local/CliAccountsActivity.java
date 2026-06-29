@@ -2,6 +2,7 @@ package com.apiproxy.local;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,40 +26,74 @@ import com.google.android.material.textfield.TextInputLayout;
 
 import org.json.JSONArray;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 public class CliAccountsActivity extends AppCompatActivity {
+    private static final String TAG = "CliAccountsActivity";
     private static final String PREF_KEY = "cli_accounts";
     private final List<CliAccount> accounts = new ArrayList<>();
     private RecyclerView recyclerView;
     private AccountAdapter adapter;
     private View emptyView;
 
+    private void writeDebugLog(String msg) {
+        Log.e(TAG, msg);
+        try {
+            File logDir = getExternalFilesDir(null);
+            if (logDir != null) {
+                File logFile = new File(logDir, "cli_accounts_debug.log");
+                FileWriter fw = new FileWriter(logFile, true);
+                fw.write(System.currentTimeMillis() + " " + msg + "\n");
+                fw.close();
+            }
+        } catch (Exception ignored) {}
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_cli_accounts);
+        writeDebugLog("onCreate start");
+        try {
+            super.onCreate(savedInstanceState);
+            writeDebugLog("super.onCreate done");
+            setContentView(R.layout.activity_cli_accounts);
+            writeDebugLog("setContentView done");
 
-        MaterialToolbar toolbar = findViewById(R.id.toolbar);
-        toolbar.setTitle(R.string.cli_accounts_title);
-        setSupportActionBar(toolbar);
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            MaterialToolbar toolbar = findViewById(R.id.toolbar);
+            writeDebugLog("toolbar found: " + (toolbar != null));
+            toolbar.setTitle(R.string.cli_accounts_title);
+            setSupportActionBar(toolbar);
+            if (getSupportActionBar() != null) {
+                getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            }
+            writeDebugLog("toolbar setup done");
+
+            recyclerView = findViewById(R.id.recyclerAccounts);
+            emptyView = findViewById(R.id.emptyView);
+            MaterialButton btnAdd = findViewById(R.id.btnAddAccount);
+            writeDebugLog("views found");
+
+            recyclerView.setLayoutManager(new LinearLayoutManager(this));
+            adapter = new AccountAdapter(accounts, this::showEditor);
+            recyclerView.setAdapter(adapter);
+            writeDebugLog("adapter setup done");
+
+            btnAdd.setOnClickListener(v -> showEditor(null));
+            writeDebugLog("btnAdd listener set");
+
+            loadAccounts();
+            writeDebugLog("loadAccounts done");
+        } catch (Exception e) {
+            String err = "CLI页崩溃: " + e.getClass().getSimpleName() + ": " + e.getMessage();
+            writeDebugLog(err);
+            try {
+                Toast.makeText(this, err, Toast.LENGTH_LONG).show();
+            } catch (Exception ignored) {}
+            finish();
         }
-
-        recyclerView = findViewById(R.id.recyclerAccounts);
-        emptyView = findViewById(R.id.emptyView);
-        MaterialButton btnAdd = findViewById(R.id.btnAddAccount);
-
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new AccountAdapter(accounts, this::showEditor);
-        recyclerView.setAdapter(adapter);
-
-        btnAdd.setOnClickListener(v -> showEditor(null));
-
-        loadAccounts();
     }
 
     @Override
