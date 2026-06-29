@@ -5,10 +5,14 @@
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:enforceStatusBarContrast">false</item>
+        <!-- Preference theme for PreferenceFragmentCompat -->
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material3</item>
     </style>
 
     <style name="Theme.APIProxy.Dynamic" parent="Theme.Material3.DynamicColors.DayNight.NoActionBar">
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
+        <!-- Preference theme for PreferenceFragmentCompat -->
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material3</item>
     </style>
 </resources>
