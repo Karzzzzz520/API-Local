@@ -27,6 +27,9 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Logger.init(getExternalFilesDir(null));
+        Logger.i("MainActivity onCreate");
+
         DynamicColors.applyToActivityIfAvailable(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -36,12 +39,16 @@ public class MainActivity extends AppCompatActivity {
         tvStatus = findViewById(R.id.tvStatus);
         FloatingActionButton fabSettings = findViewById(R.id.fabSettings);
 
-        fabSettings.setOnClickListener(v -> startActivity(new Intent(this, SettingsActivity.class)));
+        fabSettings.setOnClickListener(v -> {
+            Logger.d("FAB settings clicked");
+            startActivity(new Intent(this, SettingsActivity.class));
+        });
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new ProviderAdapter(this, providers, proxyPort, new ProviderAdapter.OnProviderListener() {
             @Override
             public void onToggleEnabled(ApiProvider provider, boolean enabled) {
+                Logger.d("Toggle " + provider.getName() + " -> " + enabled);
                 provider.setEnabled(enabled);
                 adapter.notifyDataSetChanged();
             }
@@ -53,11 +60,12 @@ public class MainActivity extends AppCompatActivity {
                 android.content.ClipData clip = android.content.ClipData.newPlainText("endpoint",
                         provider.getLocalEndpoint(proxyPort));
                 clipboard.setPrimaryClip(clip);
-                Toast.makeText(MainActivity.this, R.string.endpoint_copied, Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "端点已复制", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onProviderLongClick(ApiProvider provider) {
+                Logger.d("Long click: " + provider.getName());
                 android.widget.EditText et = new android.widget.EditText(MainActivity.this);
                 et.setText(provider.getApiKey());
                 new com.google.android.material.dialog.MaterialAlertDialogBuilder(MainActivity.this)
@@ -66,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
                         .setPositiveButton("保存", (d, w) -> {
                             provider.setApiKey(et.getText().toString().trim());
                             adapter.notifyDataSetChanged();
+                            Logger.i("API key updated for " + provider.getName());
                         })
                         .setNegativeButton("取消", null)
                         .show();
@@ -101,21 +110,26 @@ public class MainActivity extends AppCompatActivity {
                     ));
                 }
             }
-        } catch (Exception ignored) {}
+        } catch (Exception e) {
+            Logger.e("Failed to load CLI accounts", e);
+        }
         adapter.notifyDataSetChanged();
     }
 
     private void toggleProxy() {
         if (proxyServer != null && proxyServer.isRunning()) {
+            Logger.i("Stopping proxy");
             proxyServer.stop();
             updateStatus(false);
         } else {
+            Logger.i("Starting proxy on port " + proxyPort);
             proxyServer = new ProxyServer(proxyPort, providers);
             proxyServer.setStatusCallback(running -> runOnUiThread(() -> updateStatus(running)));
             try {
                 proxyServer.start();
                 updateStatus(true);
             } catch (Exception e) {
+                Logger.e("Failed to start proxy", e);
                 Toast.makeText(this, "启动代理失败: " + e.getMessage(), Toast.LENGTH_LONG).show();
             }
         }
