@@ -12,7 +12,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -38,7 +37,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
-import com.google.android.material.textfield.TextInputLayout;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -63,32 +61,24 @@ public class MainActivity extends androidx.appcompat.app.AppCompatActivity {
     private RecyclerView recyclerProviders;
     private FloatingActionButton fabAddProvider;
     private MaterialCardView cardServer;
-
     private ProviderAdapter adapter;
     private final List<ApiProvider> providers = new ArrayList<>();
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
-
     private ProxyService proxyService;
     private boolean serviceBound = false;
 
     private final ActivityResultLauncher<String> notificationPermissionLauncher =
-            registerForActivityResult(new ActivityResultContracts.RequestPermission(), granted -> {
-                startProxyServer();
-            });
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), granted -> startProxyServer());
 
     private final ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            ProxyService.LocalBinder binder = (ProxyService.LocalBinder) service;
-            proxyService = binder.getService();
+            proxyService = ((ProxyService.LocalBinder) service).getService();
             serviceBound = true;
             updateServerUI(proxyService.isProxyRunning());
         }
-
         @Override
-        public void onServiceDisconnected(ComponentName name) {
-            serviceBound = false;
-        }
+        public void onServiceDisconnected(ComponentName name) { serviceBound = false; }
     };
 
     @Override
@@ -96,16 +86,12 @@ public class MainActivity extends androidx.appcompat.app.AppCompatActivity {
         DynamicColors.applyToActivityIfAvailable(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Window window = getWindow();
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.setStatusBarColor(android.graphics.Color.TRANSPARENT);
-            window.getDecorView().setSystemUiVisibility(
-                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-            );
+            Window w = getWindow();
+            w.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            w.setStatusBarColor(android.graphics.Color.TRANSPARENT);
+            w.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
         }
-
         initViews();
         loadProviders();
         bindProxyService();
@@ -124,9 +110,7 @@ public class MainActivity extends androidx.appcompat.app.AppCompatActivity {
 
         com.google.android.material.appbar.MaterialToolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayShowTitleEnabled(true);
-        }
+        if (getSupportActionBar() != null) getSupportActionBar().setDisplayShowTitleEnabled(true);
 
         btnToggleServer.setOnClickListener(v -> toggleServer());
         fabAddProvider.setOnClickListener(v -> showAddProviderDialog(null));
@@ -134,55 +118,34 @@ public class MainActivity extends androidx.appcompat.app.AppCompatActivity {
         recyclerProviders.setLayoutManager(new LinearLayoutManager(this));
         adapter = new ProviderAdapter(this, providers, getPort(), new ProviderAdapter.OnProviderListener() {
             @Override
-            public void onToggleEnabled(ApiProvider provider, boolean enabled) {
-                provider.setEnabled(enabled);
-                saveProviders();
-                updateProviderCount();
-                if (serviceBound && proxyService.isProxyRunning()) {
-                    restartServer();
-                }
+            public void onToggleEnabled(ApiProvider p, boolean enabled) {
+                p.setEnabled(enabled); saveProviders(); updateProviderCount();
+                if (serviceBound && proxyService != null && proxyService.isProxyRunning()) restartServer();
             }
-
             @Override
-            public void onProviderClick(ApiProvider provider) {
-                showAddProviderDialog(provider);
-            }
-
+            public void onProviderClick(ApiProvider p) { showAddProviderDialog(p); }
             @Override
-            public void onProviderLongClick(ApiProvider provider) {
-                showDeleteConfirmDialog(provider);
-            }
+            public void onProviderLongClick(ApiProvider p) { showDeleteConfirmDialog(p); }
         });
         recyclerProviders.setAdapter(adapter);
 
-        SharedPreferences prefs = getSharedPreferences("apiproxy", MODE_PRIVATE);
-        etPort.setText(String.valueOf(prefs.getInt("port", 8080)));
-
-        if (providers.isEmpty()) {
-            loadDefaultProviders();
-        }
+        etPort.setText(String.valueOf(getSharedPreferences("apiproxy", MODE_PRIVATE).getInt("port", 8080)));
+        if (providers.isEmpty()) loadDefaultProviders();
     }
 
     private void bindProxyService() {
-        Intent intent = new Intent(this, ProxyService.class);
-        bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
+        bindService(new Intent(this, ProxyService.class), serviceConnection, Context.BIND_AUTO_CREATE);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        if (!serviceBound) {
-            Intent intent = new Intent(this, ProxyService.class);
-            bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
-        }
+        if (!serviceBound) bindService(new Intent(this, ProxyService.class), serviceConnection, Context.BIND_AUTO_CREATE);
     }
 
     @Override
     protected void onDestroy() {
-        if (serviceBound) {
-            unbindService(serviceConnection);
-            serviceBound = false;
-        }
+        if (serviceBound) { unbindService(serviceConnection); serviceBound = false; }
         super.onDestroy();
     }
 
@@ -194,8 +157,7 @@ public class MainActivity extends androidx.appcompat.app.AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
+        if (item.getItemId() == R.id.action_settings) {
             startActivity(new Intent(this, SettingsActivity.class));
             return true;
         }
@@ -203,11 +165,8 @@ public class MainActivity extends androidx.appcompat.app.AppCompatActivity {
     }
 
     private int getPort() {
-        try {
-            return Integer.parseInt(etPort.getText().toString().trim());
-        } catch (NumberFormatException e) {
-            return 8080;
-        }
+        try { return Integer.parseInt(etPort.getText().toString().trim()); }
+        catch (NumberFormatException e) { return 8080; }
     }
 
     private void toggleServer() {
@@ -216,62 +175,38 @@ public class MainActivity extends androidx.appcompat.app.AppCompatActivity {
             updateServerUI(false);
             Toast.makeText(this, "代理服务器已停止", Toast.LENGTH_SHORT).show();
         } else {
-            if (Build.VERSION.SDK_INT >= 33) {
+            if (Build.VERSION.SDK_INT >= 33)
                 notificationPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS);
-            } else {
-                startProxyServer();
-            }
+            else startProxyServer();
         }
     }
 
     private void startProxyServer() {
         int port = getPort();
-        if (port < 1024 || port > 65535) {
-            etPort.setError("端口范围: 1024-65535");
-            return;
-        }
-
-        getSharedPreferences("apiproxy", MODE_PRIVATE)
-                .edit()
-                .putInt("port", port)
-                .apply();
+        if (port < 1024 || port > 65535) { etPort.setError("端口: 1024-65535"); return; }
+        getSharedPreferences("apiproxy", MODE_PRIVATE).edit().putInt("port", port).apply();
 
         boolean hasEnabled = false;
         for (ApiProvider p : providers) {
-            if (p.isEnabled() && p.getApiKey() != null && !p.getApiKey().isEmpty()) {
-                hasEnabled = true;
-                break;
-            }
+            if (p.isEnabled() && p.getApiKey() != null && !p.getApiKey().isEmpty()) { hasEnabled = true; break; }
         }
-
         if (!hasEnabled) {
-            Snackbar.make(findViewById(android.R.id.content),
-                    "请至少添加一个启用的 API Key", Snackbar.LENGTH_LONG).show();
+            Snackbar.make(findViewById(android.R.id.content), "请至少添加一个启用的 API Key", Snackbar.LENGTH_LONG).show();
             return;
         }
 
-        Intent serviceIntent = new Intent(this, ProxyService.class);
-        ContextCompat.startForegroundService(this, serviceIntent);
-
+        ContextCompat.startForegroundService(this, new Intent(this, ProxyService.class));
         List<ApiProvider> allProviders = new ArrayList<>(providers);
-        List<ApiProvider> cliProviders = loadCliProviders();
-        for (ApiProvider cp : cliProviders) {
+        for (ApiProvider cp : loadCliProviders()) {
             boolean exists = false;
-            for (ApiProvider p : allProviders) {
-                if (p.getName().equals(cp.getName())) { exists = true; break; }
-            }
+            for (ApiProvider p : allProviders) { if (p.getName().equals(cp.getName())) { exists = true; break; } }
             if (!exists) allProviders.add(cp);
         }
-
         final List<ApiProvider> finalProviders = allProviders;
         mainHandler.postDelayed(() -> {
-            if (serviceBound && proxyService != null) {
-                proxyService.startProxy(port, finalProviders,
-                        msg -> runOnUiThread(() -> logToUI(msg)),
-                        running -> runOnUiThread(() -> updateServerUI(running)));
-            }
+            if (serviceBound && proxyService != null)
+                proxyService.startProxy(port, finalProviders, msg -> runOnUiThread(() -> logToUI(msg)), running -> runOnUiThread(() -> updateServerUI(running)));
         }, 300);
-
         Toast.makeText(this, "正在启动代理服务器...", Toast.LENGTH_SHORT).show();
     }
 
@@ -279,26 +214,20 @@ public class MainActivity extends androidx.appcompat.app.AppCompatActivity {
         if (running) {
             btnToggleServer.setText(R.string.stop_server);
             btnToggleServer.setIconResource(R.drawable.ic_stop);
-            btnToggleServer.setBackgroundTintList(ColorStateList.valueOf(
-                    android.graphics.Color.parseColor("#4CAF50")));
+            btnToggleServer.setBackgroundTintList(ColorStateList.valueOf(android.graphics.Color.parseColor("#4CAF50")));
             tvStatus.setText(R.string.server_running);
             tvStatus.setTextColor(android.graphics.Color.parseColor("#4CAF50"));
-            GradientDrawable drawable = (GradientDrawable) statusDot.getBackground();
-            drawable.setColor(android.graphics.Color.parseColor("#4CAF50"));
-            statusDot.setBackground(drawable);
+            ((GradientDrawable) statusDot.getBackground()).setColor(android.graphics.Color.parseColor("#4CAF50"));
             tvEndpoint.setVisibility(View.VISIBLE);
             tvEndpoint.setText("http://localhost:" + getPort());
             etPort.setEnabled(false);
         } else {
             btnToggleServer.setText(R.string.start_server);
             btnToggleServer.setIconResource(R.drawable.ic_play);
-            btnToggleServer.setBackgroundTintList(ColorStateList.valueOf(
-                    getColor(android.R.color.holo_green_dark)));
+            btnToggleServer.setBackgroundTintList(ColorStateList.valueOf(getColor(android.R.color.holo_green_dark)));
             tvStatus.setText(R.string.server_stopped);
             tvStatus.setTextColor(android.graphics.Color.parseColor("#757575"));
-            GradientDrawable drawable = (GradientDrawable) statusDot.getBackground();
-            drawable.setColor(android.graphics.Color.parseColor("#F44336"));
-            statusDot.setBackground(drawable);
+            ((GradientDrawable) statusDot.getBackground()).setColor(android.graphics.Color.parseColor("#F44336"));
             tvEndpoint.setVisibility(View.GONE);
             etPort.setEnabled(true);
         }
@@ -307,38 +236,30 @@ public class MainActivity extends androidx.appcompat.app.AppCompatActivity {
 
     private void restartServer() {
         if (serviceBound && proxyService != null && proxyService.isProxyRunning()) {
-            int port = getPort();
             List<ApiProvider> allProviders = new ArrayList<>(providers);
-            List<ApiProvider> cliProviders = loadCliProviders();
-            for (ApiProvider cp : cliProviders) {
+            for (ApiProvider cp : loadCliProviders()) {
                 boolean exists = false;
-                for (ApiProvider p : allProviders) {
-                    if (p.getName().equals(cp.getName())) { exists = true; break; }
-                }
+                for (ApiProvider p : allProviders) { if (p.getName().equals(cp.getName())) { exists = true; break; } }
                 if (!exists) allProviders.add(cp);
             }
-            proxyService.startProxy(port, allProviders,
-                    msg -> runOnUiThread(() -> logToUI(msg)),
-                    running -> runOnUiThread(() -> updateServerUI(running)));
+            proxyService.startProxy(getPort(), allProviders, msg -> runOnUiThread(() -> logToUI(msg)), running -> runOnUiThread(() -> updateServerUI(running)));
         }
     }
 
     private void logToUI(String msg) {
-        if (msg.startsWith("❌") || msg.startsWith("⚠️")) {
+        if (msg.startsWith("❌") || msg.startsWith("⚠️"))
             Snackbar.make(findViewById(android.R.id.content), msg, Snackbar.LENGTH_SHORT).show();
-        }
     }
 
     // =================== Provider Management ===================
 
     private void showAddProviderDialog(ApiProvider existing) {
-        LayoutInflater inflater = LayoutInflater.from(this);
-        View dialogView = inflater.inflate(R.layout.dialog_add_provider, null);
-        TextInputEditText etName = dialogView.findViewById(R.id.etName);
-        TextInputEditText etBaseUrl = dialogView.findViewById(R.id.etBaseUrl);
-        TextInputEditText etApiKey = dialogView.findViewById(R.id.etApiKey);
-        MaterialButton btnCancel = dialogView.findViewById(R.id.btnCancel);
-        MaterialButton btnSave = dialogView.findViewById(R.id.btnSave);
+        View view = LayoutInflater.from(this).inflate(R.layout.dialog_add_provider, null);
+        TextInputEditText etName = view.findViewById(R.id.etName);
+        TextInputEditText etBaseUrl = view.findViewById(R.id.etBaseUrl);
+        TextInputEditText etApiKey = view.findViewById(R.id.etApiKey);
+        MaterialButton btnCancel = view.findViewById(R.id.btnCancel);
+        MaterialButton btnSave = view.findViewById(R.id.btnSave);
 
         boolean isEdit = existing != null;
         if (isEdit) {
@@ -346,28 +267,18 @@ public class MainActivity extends androidx.appcompat.app.AppCompatActivity {
             etBaseUrl.setText(existing.getBaseUrl());
             etApiKey.setText(existing.getApiKey());
         }
-
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
-        builder.setView(dialogView);
-        AlertDialog dialog = builder.create();
-        if (isEdit) dialog.setTitle("编辑服务商");
+        AlertDialog dialog = new MaterialAlertDialogBuilder(this).setView(view).create();
         dialog.show();
-
         btnCancel.setOnClickListener(v -> dialog.dismiss());
         btnSave.setOnClickListener(v -> {
             String name = etName.getText().toString().trim();
             String baseUrl = etBaseUrl.getText().toString().trim();
             String apiKey = etApiKey.getText().toString().trim();
-            if (name.isEmpty()) { etName.setError("请输入名称"); return; }
-            if (baseUrl.isEmpty()) { etBaseUrl.setError("请输入 API 地址"); return; }
-            if (apiKey.isEmpty()) { etApiKey.setError("请输入 API Key"); return; }
-            if (isEdit) {
-                existing.setName(name);
-                existing.setBaseUrl(baseUrl);
-                existing.setApiKey(apiKey);
-            } else {
-                providers.add(new ApiProvider(UUID.randomUUID().toString(), name, baseUrl, apiKey, true));
-            }
+            if (name.isEmpty()) { etName.setError("必填"); return; }
+            if (baseUrl.isEmpty()) { etBaseUrl.setError("必填"); return; }
+            if (apiKey.isEmpty()) { etApiKey.setError("必填"); return; }
+            if (isEdit) { existing.setName(name); existing.setBaseUrl(baseUrl); existing.setApiKey(apiKey); }
+            else providers.add(new ApiProvider(UUID.randomUUID().toString(), name, baseUrl, apiKey, true));
             saveProviders();
             adapter.notifyDataSetChanged();
             updateProviderCount();
@@ -380,15 +291,23 @@ public class MainActivity extends androidx.appcompat.app.AppCompatActivity {
         new MaterialAlertDialogBuilder(this)
                 .setTitle("删除服务商")
                 .setMessage("确定要删除 " + provider.getName() + " 吗？")
-                .setPositiveButton("删除", (dialog, which) -> {
+                .setPositiveButton("删除", (d, w) -> {
                     providers.remove(provider);
                     saveProviders();
                     adapter.notifyDataSetChanged();
                     updateProviderCount();
                     if (serviceBound && proxyService != null && proxyService.isProxyRunning()) restartServer();
                 })
-                .setNegativeButton("取消", null)
-                .show();
+                .setNegativeButton("取消", null).show();
+    }
+
+    private void loadDefaultProviders() {
+        for (String[] def : DEFAULT_PROVIDERS) {
+            providers.add(new ApiProvider(UUID.randomUUID().toString(), def[0], def[1], "", false));
+        }
+        saveProviders();
+        adapter.notifyDataSetChanged();
+        updateProviderCount();
     }
 
     // =================== Persistence ===================
@@ -396,12 +315,10 @@ public class MainActivity extends androidx.appcompat.app.AppCompatActivity {
     private void loadProviders() {
         providers.clear();
         try {
-            SharedPreferences prefs = getSharedPreferences("apiproxy", MODE_PRIVATE);
-            String jsonStr = prefs.getString("providers", "[]");
-            JSONArray jsonArray = new JSONArray(jsonStr);
-            for (int i = 0; i < jsonArray.length(); i++) {
-                ApiProvider provider = ApiProvider.fromJson(jsonArray.getJSONObject(i));
-                if (provider != null) providers.add(provider);
+            JSONArray arr = new JSONArray(getSharedPreferences("apiproxy", MODE_PRIVATE).getString("providers", "[]"));
+            for (int i = 0; i < arr.length(); i++) {
+                ApiProvider p = ApiProvider.fromJson(arr.getJSONObject(i));
+                if (p != null) providers.add(p);
             }
         } catch (Exception ignored) {}
         updateProviderCount();
@@ -409,36 +326,29 @@ public class MainActivity extends androidx.appcompat.app.AppCompatActivity {
 
     private void saveProviders() {
         try {
-            JSONArray jsonArray = new JSONArray();
-            for (ApiProvider provider : providers) jsonArray.put(provider.toJson());
-            SharedPreferences prefs = getSharedPreferences("apiproxy", MODE_PRIVATE);
-            prefs.edit().putString("providers", jsonArray.toString()).apply();
+            JSONArray arr = new JSONArray();
+            for (ApiProvider p : providers) arr.put(p.toJson());
+            getSharedPreferences("apiproxy", MODE_PRIVATE).edit().putString("providers", arr.toString()).apply();
         } catch (Exception e) { e.printStackTrace(); }
     }
 
     private List<ApiProvider> loadCliProviders() {
-        List<ApiProvider> cliProviders = new ArrayList<>();
+        List<ApiProvider> cli = new ArrayList<>();
         try {
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-            String jsonStr = prefs.getString("cli_accounts", "[]");
-            JSONArray array = new JSONArray(jsonStr);
-            for (int i = 0; i < array.length(); i++) {
-                CliAccount account = CliAccount.fromJson(array.getJSONObject(i));
-                if (account != null && account.isEnabled()) {
-                    cliProviders.add(account.toApiProvider());
-                }
+            JSONArray arr = new JSONArray(PreferenceManager.getDefaultSharedPreferences(this).getString("cli_accounts", "[]"));
+            for (int i = 0; i < arr.length(); i++) {
+                CliAccount acc = CliAccount.fromJson(arr.getJSONObject(i));
+                if (acc != null && acc.isEnabled()) cli.add(acc.toApiProvider());
             }
         } catch (Exception ignored) {}
-        return cliProviders;
+        return cli;
     }
 
     private void updateProviderCount() {
-        int count = 0;
-        for (ApiProvider p : providers) {
-            if (!p.getApiKey().isEmpty()) count++;
-        }
-        String text = providers.size() + " 个服务商";
-        if (count > 0) text += " (" + count + " 个已配置)";
-        tvProviderCount.setText(text);
+        int c = 0;
+        for (ApiProvider p : providers) { if (!p.getApiKey().isEmpty()) c++; }
+        String t = providers.size() + " 个服务商";
+        if (c > 0) t += " (" + c + " 个已配置)";
+        tvProviderCount.setText(t);
     }
 }
