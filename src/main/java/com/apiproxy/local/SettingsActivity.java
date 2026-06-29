@@ -2,13 +2,10 @@ package com.apiproxy.local;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -21,185 +18,98 @@ import androidx.preference.SwitchPreferenceCompat;
 
 import com.google.android.material.color.DynamicColors;
 
-import java.io.File;
-import java.io.FileWriter;
 import java.util.Locale;
 
 public class SettingsActivity extends AppCompatActivity {
 
-    private static final String TAG = "SettingsActivity";
-
-    private void writeDebugLog(String msg) {
-        Log.e(TAG, msg);
-        try {
-            File logDir = getExternalFilesDir(null);
-            if (logDir != null) {
-                File logFile = new File(logDir, "settings_debug.log");
-                FileWriter fw = new FileWriter(logFile, true);
-                fw.write(System.currentTimeMillis() + " " + msg + "\n");
-                fw.close();
-            }
-        } catch (Exception ignored) {}
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        writeDebugLog("onCreate start");
-        try {
-            DynamicColors.applyToActivityIfAvailable(this);
-            super.onCreate(savedInstanceState);
-            writeDebugLog("super.onCreate done");
-            setContentView(R.layout.activity_settings);
-            writeDebugLog("setContentView done");
-            if (savedInstanceState == null) {
-                getSupportFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.settings_container, new SettingsFragment())
-                        .commit();
-                writeDebugLog("fragment committed");
+        DynamicColors.applyToActivityIfAvailable(this);
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_settings);
+
+        if (savedInstanceState == null) {
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.settings_container, new SettingsFragment())
+                    .commit();
+        }
+
+        com.google.android.material.appbar.MaterialToolbar toolbar = findViewById(R.id.toolbar);
+        if (toolbar != null) {
+            setSupportActionBar(toolbar);
+            if (getSupportActionBar() != null) {
+                getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                getSupportActionBar().setTitle(R.string.settings);
             }
-            com.google.android.material.appbar.MaterialToolbar toolbar = findViewById(R.id.toolbar);
-            if (toolbar != null) {
-                setSupportActionBar(toolbar);
-                if (getSupportActionBar() != null) {
-                    getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-                    getSupportActionBar().setTitle(R.string.settings);
-                }
-            }
-            writeDebugLog("onCreate complete");
-        } catch (Exception e) {
-            String err = "设置页崩溃: " + e.getClass().getSimpleName() + ": " + e.getMessage();
-            writeDebugLog(err);
-            try {
-                Toast.makeText(this, err, Toast.LENGTH_LONG).show();
-            } catch (Exception ignored) {}
-            finish();
         }
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            finish();
-            return true;
-        }
+        if (item.getItemId() == android.R.id.home) { finish(); return true; }
         return super.onOptionsItemSelected(item);
     }
 
     public static class SettingsFragment extends PreferenceFragmentCompat {
 
-        private void logFrag(String msg) {
-            try {
-                File f = new File(requireActivity().getExternalFilesDir(null), "settings_debug.log");
-                FileWriter fw = new FileWriter(f, true);
-                fw.write(System.currentTimeMillis() + " [FRAG] " + msg + "\n");
-                fw.close();
-            } catch (Exception ignored) {}
-        }
-
         @Override
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
-            try {
-                logFrag("onCreatePreferences start");
-                setPreferencesFromResource(R.xml.preferences, rootKey);
-                logFrag("setPreferencesFromResource done");
+            setPreferencesFromResource(R.xml.preferences, rootKey);
 
-                ListPreference languagePref = findPreference("language");
-                if (languagePref != null) logFrag("languagePref found");
+            ListPreference languagePref = findPreference("language");
+            ListPreference themePref = findPreference("theme_mode");
+            SwitchPreferenceCompat dynamicPref = findPreference("dynamic_colors");
+            Preference githubPref = findPreference("github_link");
+            Preference cliAccountsPref = findPreference("cli_accounts");
+            Preference versionPref = findPreference("version");
 
-                ListPreference themePref = findPreference("theme_mode");
-                if (themePref != null) logFrag("themePref found");
-
-                SwitchPreferenceCompat dynamicPref = findPreference("dynamic_colors");
-                if (dynamicPref != null) logFrag("dynamicPref found");
-
-                Preference githubPref = findPreference("github_link");
-                if (githubPref != null) logFrag("githubPref found");
-
-                Preference cliAccountsPref = findPreference("cli_accounts");
-                if (cliAccountsPref != null) logFrag("cliAccountsPref found");
-
-                Preference versionPref = findPreference("version");
-                if (versionPref != null) logFrag("versionPref found");
-
-                // Set up listeners
-                if (languagePref != null) {
-                    languagePref.setOnPreferenceChangeListener((preference, newValue) -> {
-                        String lang = newValue.toString();
-                        setLocale(lang);
-                        requireActivity().recreate();
-                        return true;
-                    });
-                }
-                logFrag("language listener set");
-
-                if (themePref != null) {
-                    themePref.setOnPreferenceChangeListener((preference, newValue) -> {
-                        AppCompatDelegate.setDefaultNightMode(Integer.parseInt(newValue.toString()));
-                        return true;
-                    });
-                }
-                logFrag("theme listener set");
-
-                if (dynamicPref != null) {
-                    dynamicPref.setOnPreferenceChangeListener((preference, newValue) -> {
-                        requireActivity().recreate();
-                        return true;
-                    });
-                }
-                logFrag("dynamic listener set");
-
-                if (githubPref != null) {
-                    githubPref.setOnPreferenceClickListener(preference -> {
-                        startActivity(new Intent(Intent.ACTION_VIEW,
-                                android.net.Uri.parse("https://github.com/Karzzzzz520/API-Local")));
-                        return true;
-                    });
-                }
-                logFrag("github listener set");
-
-                if (cliAccountsPref != null) {
-                    cliAccountsPref.setOnPreferenceClickListener(preference -> {
-                        startActivity(new Intent(requireContext(), CliAccountsActivity.class));
-                        return true;
-                    });
-                }
-                logFrag("cli listener set");
-
-                if (versionPref != null) {
-                    try {
-                        String version = requireContext().getPackageManager()
-                                .getPackageInfo(requireContext().getPackageName(), 0).versionName;
-                        versionPref.setSummary("v" + version);
-                    } catch (Exception e) {
-                        versionPref.setSummary("v1.2.7");
-                    }
-                }
-                logFrag("onCreatePreferences complete");
-            } catch (Exception e) {
-                logFrag("CRASH: " + e.getClass().getSimpleName() + ": " + e.getMessage());
-                try {
-                    Toast.makeText(getActivity(), "设置项: " + e.getClass().getSimpleName() + ": " + e.getMessage(), Toast.LENGTH_LONG).show();
-                } catch (Exception ignored) {}
+            if (languagePref != null) {
+                languagePref.setOnPreferenceChangeListener((preference, newValue) -> {
+                    setLocale(newValue.toString());
+                    requireActivity().recreate();
+                    return true;
+                });
             }
-        }
 
-        @Override
-        public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-            super.onViewCreated(view, savedInstanceState);
-            logFrag("onViewCreated called");
-        }
+            if (themePref != null) {
+                themePref.setOnPreferenceChangeListener((preference, newValue) -> {
+                    AppCompatDelegate.setDefaultNightMode(Integer.parseInt(newValue.toString()));
+                    return true;
+                });
+            }
 
-        @Override
-        public void onStart() {
-            super.onStart();
-            logFrag("onStart called");
-        }
+            if (dynamicPref != null) {
+                dynamicPref.setOnPreferenceChangeListener((preference, newValue) -> {
+                    requireActivity().recreate();
+                    return true;
+                });
+            }
 
-        @Override
-        public void onResume() {
-            super.onResume();
-            logFrag("onResume called");
+            if (githubPref != null) {
+                githubPref.setOnPreferenceClickListener(preference -> {
+                    startActivity(new Intent(Intent.ACTION_VIEW,
+                            android.net.Uri.parse("https://github.com/Karzzzzz520/API-Local")));
+                    return true;
+                });
+            }
+
+            if (cliAccountsPref != null) {
+                cliAccountsPref.setOnPreferenceClickListener(preference -> {
+                    startActivity(new Intent(requireContext(), CliAccountsActivity.class));
+                    return true;
+                });
+            }
+
+            if (versionPref != null) {
+                try {
+                    String version = requireContext().getPackageManager()
+                            .getPackageInfo(requireContext().getPackageName(), 0).versionName;
+                    versionPref.setSummary("v" + version);
+                } catch (Exception e) {
+                    versionPref.setSummary("v1.2.7");
+                }
+            }
         }
 
         private void setLocale(String lang) {
@@ -214,8 +124,6 @@ public class SettingsActivity extends AppCompatActivity {
             config.setLocale(locale);
             requireContext().getResources().updateConfiguration(config,
                     requireContext().getResources().getDisplayMetrics());
-            requireActivity().getSharedPreferences("apiproxy", Context.MODE_PRIVATE)
-                    .edit().putString("language", lang).apply();
         }
     }
 }
