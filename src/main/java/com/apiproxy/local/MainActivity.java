@@ -2,18 +2,16 @@ package com.apiproxy.local;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.color.DynamicColors;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,18 +34,20 @@ public class MainActivity extends AppCompatActivity {
         RecyclerView recyclerView = findViewById(R.id.recyclerProviders);
         btnToggle = findViewById(R.id.btnToggleProxy);
         tvStatus = findViewById(R.id.tvStatus);
+        FloatingActionButton fabSettings = findViewById(R.id.fabSettings);
+
+        fabSettings.setOnClickListener(v -> startActivity(new Intent(this, SettingsActivity.class)));
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new ProviderAdapter(this, providers, proxyPort, new ProviderAdapter.OnProviderListener() {
             @Override
             public void onToggleEnabled(ApiProvider provider, boolean enabled) {
                 provider.setEnabled(enabled);
-                saveProviders();
+                adapter.notifyDataSetChanged();
             }
 
             @Override
             public void onProviderClick(ApiProvider provider) {
-                // Copy endpoint on click
                 android.content.ClipboardManager clipboard = (android.content.ClipboardManager)
                         getSystemService(CLIPBOARD_SERVICE);
                 android.content.ClipData clip = android.content.ClipData.newPlainText("endpoint",
@@ -58,7 +58,6 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onProviderLongClick(ApiProvider provider) {
-                // Edit API key
                 android.widget.EditText et = new android.widget.EditText(MainActivity.this);
                 et.setText(provider.getApiKey());
                 new com.google.android.material.dialog.MaterialAlertDialogBuilder(MainActivity.this)
@@ -66,7 +65,6 @@ public class MainActivity extends AppCompatActivity {
                         .setView(et)
                         .setPositiveButton("保存", (d, w) -> {
                             provider.setApiKey(et.getText().toString().trim());
-                            saveProviders();
                             adapter.notifyDataSetChanged();
                         })
                         .setNegativeButton("取消", null)
@@ -81,21 +79,6 @@ public class MainActivity extends AppCompatActivity {
         updateStatus(false);
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == R.id.action_settings) {
-            startActivity(new Intent(this, SettingsActivity.class));
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
     private void loadProviders() {
         providers.clear();
         providers.add(new ApiProvider("1", "GPT", "https://api.openai.com/v1", "", true));
@@ -103,7 +86,6 @@ public class MainActivity extends AppCompatActivity {
         providers.add(new ApiProvider("3", "Claude", "https://api.anthropic.com/v1", "", true));
         providers.add(new ApiProvider("4", "DeepSeek", "https://api.deepseek.com/v1", "", true));
 
-        // Load CLI accounts from SharedPreferences and merge
         String cliJson = getSharedPreferences("apiproxy", MODE_PRIVATE)
                 .getString("cli_accounts", "[]");
         try {
@@ -120,18 +102,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         } catch (Exception ignored) {}
-
-        adapter.notifyDataSetChanged();
-    }
-
-    private void saveProviders() {
-        // Save CLI account changes to SharedPreferences
-        List<ApiProvider> cliProviders = new ArrayList<>();
-        for (ApiProvider p : providers) {
-            if ("email".equals(p.getLoginType())) {
-                cliProviders.add(p);
-            }
-        }
         adapter.notifyDataSetChanged();
     }
 
