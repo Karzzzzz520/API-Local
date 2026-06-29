@@ -49,7 +49,6 @@ import java.util.UUID;
 
 public class MainActivity extends androidx.appcompat.app.AppCompatActivity {
 
-    // 默认预设服务商
     private static final String[][] DEFAULT_PROVIDERS = {
             {"OpenAI", "https://api.openai.com"},
             {"Gemini", "https://generativelanguage.googleapis.com"},
@@ -72,14 +71,9 @@ public class MainActivity extends androidx.appcompat.app.AppCompatActivity {
     private ProxyService proxyService;
     private boolean serviceBound = false;
 
-    // 通知权限请求 (安卓13+ 前台服务需要)
     private final ActivityResultLauncher<String> notificationPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), granted -> {
-                if (granted) {
-                    startProxyServer();
-                } else {
-                    startProxyServer();
-                }
+                startProxyServer();
             });
 
     private final ServiceConnection serviceConnection = new ServiceConnection() {
@@ -184,11 +178,6 @@ public class MainActivity extends androidx.appcompat.app.AppCompatActivity {
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
-    }
-
-    @Override
     protected void onDestroy() {
         if (serviceBound) {
             unbindService(serviceConnection);
@@ -206,10 +195,6 @@ public class MainActivity extends androidx.appcompat.app.AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
-        if (id == R.id.action_html_loader) {
-            startActivity(new Intent(this, HtmlLoaderActivity.class));
-            return true;
-        }
         if (id == R.id.action_settings) {
             startActivity(new Intent(this, SettingsActivity.class));
             return true;
@@ -268,7 +253,6 @@ public class MainActivity extends androidx.appcompat.app.AppCompatActivity {
         Intent serviceIntent = new Intent(this, ProxyService.class);
         ContextCompat.startForegroundService(this, serviceIntent);
 
-        // Merge CLI accounts into provider list for this session
         List<ApiProvider> allProviders = new ArrayList<>(providers);
         List<ApiProvider> cliProviders = loadCliProviders();
         for (ApiProvider cp : cliProviders) {
@@ -299,14 +283,11 @@ public class MainActivity extends androidx.appcompat.app.AppCompatActivity {
                     android.graphics.Color.parseColor("#4CAF50")));
             tvStatus.setText(R.string.server_running);
             tvStatus.setTextColor(android.graphics.Color.parseColor("#4CAF50"));
-
             GradientDrawable drawable = (GradientDrawable) statusDot.getBackground();
             drawable.setColor(android.graphics.Color.parseColor("#4CAF50"));
             statusDot.setBackground(drawable);
-
             tvEndpoint.setVisibility(View.VISIBLE);
             tvEndpoint.setText("http://localhost:" + getPort());
-
             etPort.setEnabled(false);
         } else {
             btnToggleServer.setText(R.string.start_server);
@@ -315,15 +296,12 @@ public class MainActivity extends androidx.appcompat.app.AppCompatActivity {
                     getColor(android.R.color.holo_green_dark)));
             tvStatus.setText(R.string.server_stopped);
             tvStatus.setTextColor(android.graphics.Color.parseColor("#757575"));
-
             GradientDrawable drawable = (GradientDrawable) statusDot.getBackground();
             drawable.setColor(android.graphics.Color.parseColor("#F44336"));
             statusDot.setBackground(drawable);
-
             tvEndpoint.setVisibility(View.GONE);
             etPort.setEnabled(true);
         }
-
         adapter.notifyDataSetChanged();
     }
 
@@ -356,7 +334,6 @@ public class MainActivity extends androidx.appcompat.app.AppCompatActivity {
     private void showAddProviderDialog(ApiProvider existing) {
         LayoutInflater inflater = LayoutInflater.from(this);
         View dialogView = inflater.inflate(R.layout.dialog_add_provider, null);
-
         TextInputEditText etName = dialogView.findViewById(R.id.etName);
         TextInputEditText etBaseUrl = dialogView.findViewById(R.id.etBaseUrl);
         TextInputEditText etApiKey = dialogView.findViewById(R.id.etApiKey);
@@ -373,11 +350,7 @@ public class MainActivity extends androidx.appcompat.app.AppCompatActivity {
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
         builder.setView(dialogView);
         AlertDialog dialog = builder.create();
-
-        if (isEdit) {
-            dialog.setTitle("编辑服务商");
-        }
-
+        if (isEdit) dialog.setTitle("编辑服务商");
         dialog.show();
 
         btnCancel.setOnClickListener(v -> dialog.dismiss());
@@ -385,37 +358,21 @@ public class MainActivity extends androidx.appcompat.app.AppCompatActivity {
             String name = etName.getText().toString().trim();
             String baseUrl = etBaseUrl.getText().toString().trim();
             String apiKey = etApiKey.getText().toString().trim();
-
-            if (name.isEmpty()) {
-                etName.setError("请输入名称");
-                return;
-            }
-            if (baseUrl.isEmpty()) {
-                etBaseUrl.setError("请输入 API 地址");
-                return;
-            }
-            if (apiKey.isEmpty()) {
-                etApiKey.setError("请输入 API Key");
-                return;
-            }
-
+            if (name.isEmpty()) { etName.setError("请输入名称"); return; }
+            if (baseUrl.isEmpty()) { etBaseUrl.setError("请输入 API 地址"); return; }
+            if (apiKey.isEmpty()) { etApiKey.setError("请输入 API Key"); return; }
             if (isEdit) {
                 existing.setName(name);
                 existing.setBaseUrl(baseUrl);
                 existing.setApiKey(apiKey);
             } else {
-                String id = UUID.randomUUID().toString();
-                providers.add(new ApiProvider(id, name, baseUrl, apiKey, true));
+                providers.add(new ApiProvider(UUID.randomUUID().toString(), name, baseUrl, apiKey, true));
             }
-
             saveProviders();
             adapter.notifyDataSetChanged();
             updateProviderCount();
             dialog.dismiss();
-
-            if (serviceBound && proxyService != null && proxyService.isProxyRunning()) {
-                restartServer();
-            }
+            if (serviceBound && proxyService != null && proxyService.isProxyRunning()) restartServer();
         });
     }
 
@@ -428,37 +385,10 @@ public class MainActivity extends androidx.appcompat.app.AppCompatActivity {
                     saveProviders();
                     adapter.notifyDataSetChanged();
                     updateProviderCount();
-
-                    if (serviceBound && proxyService != null && proxyService.isProxyRunning()) {
-                        restartServer();
-                    }
+                    if (serviceBound && proxyService != null && proxyService.isProxyRunning()) restartServer();
                 })
                 .setNegativeButton("取消", null)
                 .show();
-    }
-
-    private void showInfoDialog() {
-        new MaterialAlertDialogBuilder(this)
-                .setTitle("API Proxy")
-                .setMessage("将各种 AI 服务商的 API Key 转为本地代理地址。\n\n" +
-                        "使用方法：\n" +
-                        "1. 添加服务商并填入 API Key\n" +
-                        "2. 设置端口号\n" +
-                        "3. 启动代理服务\n" +
-                        "4. 将 AI 客户端的 API 地址改为对应的本地端点\n\n" +
-                        "支持: OpenAI / Gemini / Claude / DeepSeek / 自定义")
-                .setPositiveButton("知道了", null)
-                .show();
-    }
-
-    private void loadDefaultProviders() {
-        for (String[] def : DEFAULT_PROVIDERS) {
-            String id = UUID.randomUUID().toString();
-            providers.add(new ApiProvider(id, def[0], def[1], "", false));
-        }
-        saveProviders();
-        adapter.notifyDataSetChanged();
-        updateProviderCount();
     }
 
     // =================== Persistence ===================
@@ -471,26 +401,19 @@ public class MainActivity extends androidx.appcompat.app.AppCompatActivity {
             JSONArray jsonArray = new JSONArray(jsonStr);
             for (int i = 0; i < jsonArray.length(); i++) {
                 ApiProvider provider = ApiProvider.fromJson(jsonArray.getJSONObject(i));
-                if (provider != null) {
-                    providers.add(provider);
-                }
+                if (provider != null) providers.add(provider);
             }
-        } catch (Exception e) {
-        }
+        } catch (Exception ignored) {}
         updateProviderCount();
     }
 
     private void saveProviders() {
         try {
             JSONArray jsonArray = new JSONArray();
-            for (ApiProvider provider : providers) {
-                jsonArray.put(provider.toJson());
-            }
+            for (ApiProvider provider : providers) jsonArray.put(provider.toJson());
             SharedPreferences prefs = getSharedPreferences("apiproxy", MODE_PRIVATE);
             prefs.edit().putString("providers", jsonArray.toString()).apply();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        } catch (Exception e) { e.printStackTrace(); }
     }
 
     private List<ApiProvider> loadCliProviders() {
