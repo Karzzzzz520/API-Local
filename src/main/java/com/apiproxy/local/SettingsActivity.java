@@ -1,14 +1,11 @@
 package com.apiproxy.local;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.MenuItem;
-import android.view.View;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.preference.ListPreference;
@@ -24,6 +21,7 @@ public class SettingsActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Logger.i("SettingsActivity onCreate");
         DynamicColors.applyToActivityIfAvailable(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
@@ -55,60 +53,67 @@ public class SettingsActivity extends AppCompatActivity {
 
         @Override
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
-            setPreferencesFromResource(R.xml.preferences, rootKey);
+            try {
+                Logger.d("SettingsFragment loading preferences");
+                setPreferencesFromResource(R.xml.preferences, rootKey);
 
-            ListPreference languagePref = findPreference("language");
-            ListPreference themePref = findPreference("theme_mode");
-            SwitchPreferenceCompat dynamicPref = findPreference("dynamic_colors");
-            Preference githubPref = findPreference("github_link");
-            Preference cliAccountsPref = findPreference("cli_accounts");
-            Preference versionPref = findPreference("version");
+                ListPreference languagePref = findPreference("language");
+                ListPreference themePref = findPreference("theme_mode");
+                SwitchPreferenceCompat dynamicPref = findPreference("dynamic_colors");
+                Preference githubPref = findPreference("github_link");
+                Preference cliAccountsPref = findPreference("cli_accounts");
+                Preference versionPref = findPreference("version");
 
-            if (languagePref != null) {
-                languagePref.setOnPreferenceChangeListener((preference, newValue) -> {
-                    setLocale(newValue.toString());
-                    requireActivity().recreate();
-                    return true;
-                });
-            }
-
-            if (themePref != null) {
-                themePref.setOnPreferenceChangeListener((preference, newValue) -> {
-                    AppCompatDelegate.setDefaultNightMode(Integer.parseInt(newValue.toString()));
-                    return true;
-                });
-            }
-
-            if (dynamicPref != null) {
-                dynamicPref.setOnPreferenceChangeListener((preference, newValue) -> {
-                    requireActivity().recreate();
-                    return true;
-                });
-            }
-
-            if (githubPref != null) {
-                githubPref.setOnPreferenceClickListener(preference -> {
-                    startActivity(new Intent(Intent.ACTION_VIEW,
-                            android.net.Uri.parse("https://github.com/Karzzzzz520/API-Local")));
-                    return true;
-                });
-            }
-
-            if (cliAccountsPref != null) {
-                cliAccountsPref.setOnPreferenceClickListener(preference -> {
-                    startActivity(new Intent(requireContext(), CliAccountsActivity.class));
-                    return true;
-                });
-            }
-
-            if (versionPref != null) {
-                try {
-                    String version = requireContext().getPackageManager()
-                            .getPackageInfo(requireContext().getPackageName(), 0).versionName;
-                    versionPref.setSummary("v" + version);
-                } catch (Exception e) {
-                    versionPref.setSummary("v1.2.7");
+                if (languagePref != null) {
+                    languagePref.setOnPreferenceChangeListener((preference, newValue) -> {
+                        setLocale(newValue.toString());
+                        requireActivity().recreate();
+                        return true;
+                    });
                 }
+
+                if (themePref != null) {
+                    themePref.setOnPreferenceChangeListener((preference, newValue) -> {
+                        AppCompatDelegate.setDefaultNightMode(Integer.parseInt(newValue.toString()));
+                        return true;
+                    });
+                }
+
+                if (dynamicPref != null) {
+                    dynamicPref.setOnPreferenceChangeListener((preference, newValue) -> {
+                        requireActivity().recreate();
+                        return true;
+                    });
+                }
+
+                if (githubPref != null) {
+                    githubPref.setOnPreferenceClickListener(preference -> {
+                        startActivity(new Intent(Intent.ACTION_VIEW,
+                                android.net.Uri.parse("https://github.com/Karzzzzz520/API-Local")));
+                        return true;
+                    });
+                }
+
+                if (cliAccountsPref != null) {
+                    cliAccountsPref.setOnPreferenceClickListener(preference -> {
+                        Logger.d("Opening CLI accounts");
+                        startActivity(new Intent(requireContext(), CliAccountsActivity.class));
+                        return true;
+                    });
+                }
+
+                if (versionPref != null) {
+                    try {
+                        String version = requireContext().getPackageManager()
+                                .getPackageInfo(requireContext().getPackageName(), 0).versionName;
+                        versionPref.setSummary("v" + version);
+                    } catch (Exception e) {
+                        versionPref.setSummary("v1.2.7");
+                    }
+                }
+                Logger.d("SettingsFragment loaded successfully");
+            } catch (Exception e) {
+                Logger.e("SettingsFragment onCreatePreferences failed", e);
             }
         }
 
