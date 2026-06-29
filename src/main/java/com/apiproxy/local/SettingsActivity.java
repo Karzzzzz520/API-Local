@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.os.Environment;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -31,10 +30,13 @@ public class SettingsActivity extends AppCompatActivity {
     private void writeDebugLog(String msg) {
         Log.e(TAG, msg);
         try {
-            File logFile = new File(Environment.getExternalStorageDirectory(), "apiproxy_debug.log");
-            FileWriter fw = new FileWriter(logFile, true);
-            fw.write(System.currentTimeMillis() + " " + msg + "\n");
-            fw.close();
+            File logDir = getExternalFilesDir(null);
+            if (logDir != null) {
+                File logFile = new File(logDir, "settings_debug.log");
+                FileWriter fw = new FileWriter(logFile, true);
+                fw.write(System.currentTimeMillis() + " " + msg + "\n");
+                fw.close();
+            }
         } catch (Exception ignored) {}
     }
 
