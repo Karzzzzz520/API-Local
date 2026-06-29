@@ -1,9 +1,12 @@
 package com.apiproxy.local;
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.os.Environment;
+import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -17,15 +20,33 @@ import androidx.preference.SwitchPreferenceCompat;
 
 import com.google.android.material.color.DynamicColors;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.util.Locale;
 
 public class SettingsActivity extends AppCompatActivity {
+
+    private static final String TAG = "SettingsActivity";
+
+    private void writeDebugLog(String msg) {
+        Log.e(TAG, msg);
+        try {
+            File logFile = new File(Environment.getExternalStorageDirectory(), "apiproxy_debug.log");
+            FileWriter fw = new FileWriter(logFile, true);
+            fw.write(System.currentTimeMillis() + " " + msg + "\n");
+            fw.close();
+        } catch (Exception ignored) {}
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        writeDebugLog("onCreate start");
         try {
             DynamicColors.applyToActivityIfAvailable(this);
             super.onCreate(savedInstanceState);
+            writeDebugLog("super.onCreate done");
             setContentView(R.layout.activity_settings);
+            writeDebugLog("setContentView done");
             if (savedInstanceState == null) {
                 getSupportFragmentManager()
                         .beginTransaction()
@@ -40,9 +61,13 @@ public class SettingsActivity extends AppCompatActivity {
                     getSupportActionBar().setTitle(R.string.settings);
                 }
             }
+            writeDebugLog("onCreate complete");
         } catch (Exception e) {
-            e.printStackTrace();
-            Toast.makeText(this, "设置页崩溃: " + e.getClass().getSimpleName() + ": " + e.getMessage(), Toast.LENGTH_LONG).show();
+            String err = "设置页崩溃: " + e.getClass().getSimpleName() + ": " + e.getMessage();
+            writeDebugLog(err);
+            try {
+                Toast.makeText(this, err, Toast.LENGTH_LONG).show();
+            } catch (Exception ignored) {}
             finish();
         }
     }
@@ -116,8 +141,9 @@ public class SettingsActivity extends AppCompatActivity {
                     }
                 }
             } catch (Exception e) {
-                e.printStackTrace();
-                Toast.makeText(getActivity(), "设置项崩溃: " + e.getClass().getSimpleName() + ": " + e.getMessage(), Toast.LENGTH_LONG).show();
+                try {
+                    Toast.makeText(getActivity(), "设置项: " + e.getClass().getSimpleName() + ": " + e.getMessage(), Toast.LENGTH_LONG).show();
+                } catch (Exception ignored) {}
             }
         }
 
