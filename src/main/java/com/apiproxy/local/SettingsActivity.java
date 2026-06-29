@@ -7,9 +7,11 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.preference.ListPreference;
@@ -180,6 +182,24 @@ public class SettingsActivity extends AppCompatActivity {
                     Toast.makeText(getActivity(), "设置项: " + e.getClass().getSimpleName() + ": " + e.getMessage(), Toast.LENGTH_LONG).show();
                 } catch (Exception ignored) {}
             }
+        }
+
+        @Override
+        public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+            super.onViewCreated(view, savedInstanceState);
+            logFrag("onViewCreated called");
+        }
+
+        @Override
+        public void onStart() {
+            super.onStart();
+            logFrag("onStart called");
+        }
+
+        @Override
+        public void onResume() {
+            super.onResume();
+            logFrag("onResume called");
         }
 
         private void setLocale(String lang) {
