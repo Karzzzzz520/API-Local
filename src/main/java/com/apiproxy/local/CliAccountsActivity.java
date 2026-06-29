@@ -37,6 +37,7 @@ public class CliAccountsActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Logger.i("CliAccountsActivity onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cli_accounts);
 
@@ -53,7 +54,10 @@ public class CliAccountsActivity extends AppCompatActivity {
         adapter = new SimpleAdapter(accounts, this::showEditor);
         recyclerView.setAdapter(adapter);
 
-        fabAdd.setOnClickListener(v -> showEditor(null));
+        fabAdd.setOnClickListener(v -> {
+            Logger.d("FAB add account clicked");
+            showEditor(null);
+        });
 
         loadAccounts();
     }
@@ -73,7 +77,10 @@ public class CliAccountsActivity extends AppCompatActivity {
                 CliAccount acc = CliAccount.fromJson(array.getJSONObject(i));
                 if (acc != null) accounts.add(acc);
             }
-        } catch (Exception ignored) {}
+            Logger.d("Loaded " + accounts.size() + " CLI accounts");
+        } catch (Exception e) {
+            Logger.e("Failed to load CLI accounts", e);
+        }
         updateUI();
     }
 
@@ -82,7 +89,10 @@ public class CliAccountsActivity extends AppCompatActivity {
             JSONArray array = new JSONArray();
             for (CliAccount acc : accounts) array.put(acc.toJson());
             PreferenceManager.getDefaultSharedPreferences(this).edit().putString(PREF_KEY, array.toString()).apply();
-        } catch (Exception ignored) {}
+            Logger.d("Saved " + accounts.size() + " CLI accounts");
+        } catch (Exception e) {
+            Logger.e("Failed to save CLI accounts", e);
+        }
         updateUI();
     }
 
@@ -95,6 +105,7 @@ public class CliAccountsActivity extends AppCompatActivity {
 
     private void showEditor(CliAccount existing) {
         boolean isEdit = existing != null;
+        Logger.d("Opening editor, isEdit=" + isEdit);
 
         LinearLayout layout = new LinearLayout(this);
         layout.setOrientation(LinearLayout.VERTICAL);
@@ -112,7 +123,6 @@ public class CliAccountsActivity extends AppCompatActivity {
         TextInputEditText etPwd = new TextInputEditText(this);
         pwdLayout.addView(etPwd);
 
-        // Service selector as EditText for simplicity
         TextInputLayout svcLayout = new TextInputLayout(this);
         svcLayout.setHint("服务 (GPT/Gemini/Claude/DeepSeek)");
         svcLayout.setBoxBackgroundMode(TextInputLayout.BOX_BACKGROUND_OUTLINE);
@@ -154,8 +164,10 @@ public class CliAccountsActivity extends AppCompatActivity {
                         existing.setEmail(email);
                         existing.setPassword(pwd);
                         existing.setService(svc);
+                        Logger.i("Updated account: " + email);
                     } else {
                         accounts.add(new CliAccount(UUID.randomUUID().toString(), email, pwd, svc, true));
+                        Logger.i("Added account: " + email);
                     }
                     saveAccounts();
                 })
