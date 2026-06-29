@@ -54,6 +54,7 @@ public class SettingsActivity extends AppCompatActivity {
                         .beginTransaction()
                         .replace(R.id.settings_container, new SettingsFragment())
                         .commit();
+                writeDebugLog("fragment committed");
             }
             com.google.android.material.appbar.MaterialToolbar toolbar = findViewById(R.id.toolbar);
             if (toolbar != null) {
@@ -84,12 +85,42 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     public static class SettingsFragment extends PreferenceFragmentCompat {
+
+        private void logFrag(String msg) {
+            try {
+                File f = new File(requireActivity().getExternalFilesDir(null), "settings_debug.log");
+                FileWriter fw = new FileWriter(f, true);
+                fw.write(System.currentTimeMillis() + " [FRAG] " + msg + "\n");
+                fw.close();
+            } catch (Exception ignored) {}
+        }
+
         @Override
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             try {
+                logFrag("onCreatePreferences start");
                 setPreferencesFromResource(R.xml.preferences, rootKey);
+                logFrag("setPreferencesFromResource done");
 
                 ListPreference languagePref = findPreference("language");
+                if (languagePref != null) logFrag("languagePref found");
+
+                ListPreference themePref = findPreference("theme_mode");
+                if (themePref != null) logFrag("themePref found");
+
+                SwitchPreferenceCompat dynamicPref = findPreference("dynamic_colors");
+                if (dynamicPref != null) logFrag("dynamicPref found");
+
+                Preference githubPref = findPreference("github_link");
+                if (githubPref != null) logFrag("githubPref found");
+
+                Preference cliAccountsPref = findPreference("cli_accounts");
+                if (cliAccountsPref != null) logFrag("cliAccountsPref found");
+
+                Preference versionPref = findPreference("version");
+                if (versionPref != null) logFrag("versionPref found");
+
+                // Set up listeners
                 if (languagePref != null) {
                     languagePref.setOnPreferenceChangeListener((preference, newValue) -> {
                         String lang = newValue.toString();
@@ -98,24 +129,24 @@ public class SettingsActivity extends AppCompatActivity {
                         return true;
                     });
                 }
+                logFrag("language listener set");
 
-                ListPreference themePref = findPreference("theme_mode");
                 if (themePref != null) {
                     themePref.setOnPreferenceChangeListener((preference, newValue) -> {
                         AppCompatDelegate.setDefaultNightMode(Integer.parseInt(newValue.toString()));
                         return true;
                     });
                 }
+                logFrag("theme listener set");
 
-                SwitchPreferenceCompat dynamicPref = findPreference("dynamic_colors");
                 if (dynamicPref != null) {
                     dynamicPref.setOnPreferenceChangeListener((preference, newValue) -> {
                         requireActivity().recreate();
                         return true;
                     });
                 }
+                logFrag("dynamic listener set");
 
-                Preference githubPref = findPreference("github_link");
                 if (githubPref != null) {
                     githubPref.setOnPreferenceClickListener(preference -> {
                         startActivity(new Intent(Intent.ACTION_VIEW,
@@ -123,16 +154,16 @@ public class SettingsActivity extends AppCompatActivity {
                         return true;
                     });
                 }
+                logFrag("github listener set");
 
-                Preference cliAccountsPref = findPreference("cli_accounts");
                 if (cliAccountsPref != null) {
                     cliAccountsPref.setOnPreferenceClickListener(preference -> {
                         startActivity(new Intent(requireContext(), CliAccountsActivity.class));
                         return true;
                     });
                 }
+                logFrag("cli listener set");
 
-                Preference versionPref = findPreference("version");
                 if (versionPref != null) {
                     try {
                         String version = requireContext().getPackageManager()
@@ -142,7 +173,9 @@ public class SettingsActivity extends AppCompatActivity {
                         versionPref.setSummary("v1.2.7");
                     }
                 }
+                logFrag("onCreatePreferences complete");
             } catch (Exception e) {
+                logFrag("CRASH: " + e.getClass().getSimpleName() + ": " + e.getMessage());
                 try {
                     Toast.makeText(getActivity(), "设置项: " + e.getClass().getSimpleName() + ": " + e.getMessage(), Toast.LENGTH_LONG).show();
                 } catch (Exception ignored) {}
