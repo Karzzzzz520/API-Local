@@ -18,8 +18,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.appbar.MaterialToolbar;
-import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
@@ -73,7 +73,7 @@ public class CliAccountsActivity extends AppCompatActivity {
 
             recyclerView = findViewById(R.id.recyclerAccounts);
             emptyView = findViewById(R.id.emptyView);
-            MaterialButton btnAdd = findViewById(R.id.btnAddAccount);
+            FloatingActionButton fabAdd = findViewById(R.id.btnAddAccount);
             writeDebugLog("views found");
 
             recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -81,8 +81,8 @@ public class CliAccountsActivity extends AppCompatActivity {
             recyclerView.setAdapter(adapter);
             writeDebugLog("adapter setup done");
 
-            btnAdd.setOnClickListener(v -> showEditor(null));
-            writeDebugLog("btnAdd listener set");
+            fabAdd.setOnClickListener(v -> showEditor(null));
+            writeDebugLog("fabAdd listener set");
 
             loadAccounts();
             writeDebugLog("loadAccounts done");
