@@ -21,16 +21,16 @@ import java.util.List;
 
 public class CliAccountsActivity extends AppCompatActivity {
 
-    private static class OAuthTool {
-        String name, description, authUrl;
-        OAuthTool(String name, String description, String authUrl) {
+    private static class CliTool {
+        String name, description, url;
+        CliTool(String name, String description, String url) {
             this.name = name;
             this.description = description;
-            this.authUrl = authUrl;
+            this.url = url;
         }
     }
 
-    private final List<OAuthTool> tools = new ArrayList<>();
+    private final List<CliTool> tools = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,28 +38,28 @@ public class CliAccountsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_cli_accounts);
 
         MaterialToolbar toolbar = findViewById(R.id.toolbar);
-        toolbar.setTitle("OAuth 授权");
+        toolbar.setTitle("CLI 授权");
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        tools.add(new OAuthTool("Claude Code",
-                "Anthropic CLI - OAuth Device Flow",
-                "https://console.anthropic.com/settings/keys"));
-        tools.add(new OAuthTool("Copilot CLI",
-                "GitHub CLI - OAuth Device Flow",
+        tools.add(new CliTool("Claude Code",
+                "Anthropic - OAuth 浏览器登录",
+                "https://console.anthropic.com/"));
+        tools.add(new CliTool("Copilot CLI",
+                "GitHub - OAuth Device Flow",
                 "https://github.com/login/device"));
-        tools.add(new OAuthTool("Codex CLI",
-                "OpenAI CLI - API Key (no public OAuth)",
-                "https://platform.openai.com/api-keys"));
-        tools.add(new OAuthTool("Gemini CLI",
-                "Google Gemini CLI - OAuth PKCE Flow",
-                "https://aistudio.google.com/app/apikey"));
+        tools.add(new CliTool("Antigravity CLI",
+                "Google - Google Sign-In OAuth",
+                "https://antigravity.google/product/antigravity-cli"));
+        tools.add(new CliTool("Gemini CLI",
+                "Google - OAuth PKCE Flow",
+                "https://aistudio.google.com/"));
 
         RecyclerView recyclerView = findViewById(R.id.recyclerAccounts);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(new ToolAdapter(tools, tool -> {
-            Logger.d("Opening: " + tool.name + " -> " + tool.authUrl);
-            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(tool.authUrl)));
+            Logger.d("Opening: " + tool.name + " -> " + tool.url);
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(tool.url)));
         }));
 
         findViewById(R.id.emptyView).setVisibility(View.GONE);
@@ -73,11 +73,11 @@ public class CliAccountsActivity extends AppCompatActivity {
     }
 
     private static class ToolAdapter extends RecyclerView.Adapter<ToolAdapter.VH> {
-        private final List<OAuthTool> data;
+        private final List<CliTool> data;
         private final OnToolClickListener listener;
-        interface OnToolClickListener { void onClick(OAuthTool tool); }
+        interface OnToolClickListener { void onClick(CliTool tool); }
 
-        ToolAdapter(List<OAuthTool> data, OnToolClickListener listener) {
+        ToolAdapter(List<CliTool> data, OnToolClickListener listener) {
             this.data = data;
             this.listener = listener;
         }
@@ -111,7 +111,7 @@ public class CliAccountsActivity extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(@NonNull VH h, int pos) {
-            OAuthTool tool = data.get(pos);
+            CliTool tool = data.get(pos);
             h.tvName.setText(tool.name);
             h.tvDesc.setText(tool.description);
             h.itemView.setOnClickListener(v -> listener.onClick(tool));
