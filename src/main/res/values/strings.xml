@@ -44,7 +44,7 @@
     <string name="settings_ui_style">UI 风格</string>
     <string name="settings_cli">OAuth 授权</string>
     <string name="settings_cli_accounts">OAuth 授权管理</string>
-    <string name="settings_cli_accounts_summary">Claude Code / Copilot CLI / Codex CLI / Gemini CLI</string>
+    <string name="settings_cli_accounts_summary">Claude Code / Copilot CLI / Antigravity CLI / Gemini CLI</string>
     <string name="cli_accounts_title">OAuth 授权</string>
     <string name="settings_about">关于</string>
     <string name="settings_github_summary">查看源代码</string>
