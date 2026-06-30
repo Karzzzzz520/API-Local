@@ -1,1 +1,142 @@
-cGFja2FnZSBjb20uYXBpcHJveHkubG9jYWw7CgppbXBvcnQgYW5kcm9pZC5hcHAuQWN0aXZpdHk7CmltcG9ydCBhbmRyb2lkLmNvbnRlbnQuQ29udGV4dDsKaW1wb3J0IGFuZHJvaWQuY29udGVudC5JbnRlbnQ7CmltcG9ydCBhbmRyb2lkLm5ldC5Vcmk7CmltcG9ydCBhbmRyb2lkLm9zLkJ1bmRsZTsKCmltcG9ydCBvazozaHR0cDMuTWVkaWFUeXBlOwppbXBvcnQgb2todHRwMy5SZXF1ZXN0OwppbXBvcnQgb2todHRwMy5SZXNwb25zZTsKaW1wb3J0IG9raHR0cDMuT2todHRwQ2xpZW50OwoKaW1wb3J0IGphdmEuaW8uSU9FeGNlcHRpb247CmltcG9ydCBqYXZhLnNlY3VyaXR5Lk1lc3NhZ2VEaWdlc3Q7CmltcG9ydCBqYXZhLnNlY3VyaXR5LlNlY3VyZVJhbmRvbTsKaW1wb3J0IGphdmEudXRpbC5CYXNlNjQ7CgppbXBvcnQgb3JnLmpzb24uSlNPTk9iamVjdDsKCi8qKgogKiBPQXV0aCBQS0NFIEZsb3cgLS0+IG9wZW4gYXV0aG9yaXphdGlvbiBVUkwgaW4gYnJvd3NlciwKICogY2FwdHVyZSByZXNwb25zZSB2aWEgY3VzdG9tIHNjaGVtZSBjYWxsYmFjaywgZXhjaGFuZ2UgY29kZSBmb3IgdG9rZW5zLgogKi8KcHVibGljIGNsYXNzIE9BdXRoRmxvd01hbmFnZXIgewoKICAgIHByaXZhdGUgc3RhdGljIGZpbmFsIE9BdXRoUHJvdmlkZXJDb25maWdbXQogICAgICAgICAgICBBTExfQ09ORklHUyA9IG5ldyBPQXV0aFByb3ZpZGVyQ29uZmlnW117T0F1dGhQcm92aWRlckNvbmZpZy5HT09HTEV9OwogICAgcHJpdmF0ZSBzdGF0aWMgZmluYWwgbG9uZyBSRUZSRVNIX0JVRkZFUl9NUyA9IDYwICogMTAwMDsKCiAgICBwdWJsaWMgc3RhdGljIE9BdXRoUHJvdmlkZXJDb25maWcgZ2V0Q29uZmlnQnlOYW1lKFN0cmluZyBuYW1lKSB7CiAgICAgICAgZm9yIChPQXV0aFByb3ZpZGVyQ29uZmlnIGMgOiBBTExfQ09ORklHUykgewogICAgICAgICAgICBpZiAoYy5nZXROYW1lKCkuZXF1YWxzKG5hbWUpKSByZXR1cm4gYzsKICAgICAgICB9CiAgICAgICAgcmV0dXJuIE9BdXRoUHJvdmlkZXJDb25maWcuR09PR0xFOwogICAgfQoKICAgIHB1YmxpYyBzdGF0aWMgdm9pZCBzdGFydEF1dGhvcml6YXRpb24oQWN0aXZpdHkgYWN0LCBPQXV0aFByb3ZpZGVyQ29uZmlnIGMsIGludCByZXF1ZXN0Q29kZSkgewogICAgICAgIHRyeSB7CiAgICAgICAgICAgIFN0cmluZ1tdIHBrY2UgPSBnZW5lcmF0ZVBrY2UoKTsKICAgICAgICAgICAgU3RyaW5nIHZlciA9IHBrY2VbMF0sIGNoYWxsID0gcGtjZVsxXTsKICAgICAgICAgICAgU3RyaW5nIHN0YXRlID0gZ2VuZXJhdGVTdGF0ZSgpOwogICAgICAgICAgICBVcmkgYXV0aFVybCA9IGJ1aWxkQXV0aFVybChjLCBjaGFsbCwgc3RhdGUpOwoKICAgICAgICAgICAgQnVuZGxlIGV4dHJhID0gbmV3IEJ1bmRsZSgpOwogICAgICAgICAgICBleHRyYS5wdXRTdHJpbmcoInByb3ZpZGVySWQiLCBjLmdldFByb3ZpZGVySWQoKSk7CiAgICAgICAgICAgIGV4dHJhLnB1dFN0cmluZygiY29kZVZlcmlmaWVyIiwgdmVyKTsKICAgICAgICAgICAgUmVkaXJlY3RSZWNlaXZlckFjdGl2aXR5LnNldFBlbmRpbmdBdXRoSW5mbyhleHRyYSk7CgogICAgICAgICAgICBhY3Quc3RhcnRBY3Rpdml0eUZvclJlc3VsdCgKICAgICAgICAgICAgICAgICAgICBuZXcgSW50ZW50KEludGVudC5BQ1RJT05fVklFVywgYXV0aFVybCksCiAgICAgICAgICAgICAgICAgICAgcmVxdWVzdENvZGUpOwogICAgICAgICAgICBMb2dnZXIuZCgiT0F1dGg6IFN0YXJ0ICIgKyBjLmdldE5hbWUoKSk7CiAgICAgICAgfSBjYXRjaCAoRXhjZXB0aW9uIGUpIHtMb2dnZXIuZShlLCAiT0F1dGg6IEZhaWwiKTsgfQogICAgfQoKICAgIHB1YmxpYyBzdGF0aWMgU3RyaW5nIGhhbmRsZUF1dGhSZXN1bHQoQWN0aXZpdHkgYWN0LCBpbnQgcmVxLCBpbnQgcmVzLCBJbnRlbnQgZGF0YSkgewogICAgICAgIGlmIChyZXEgIT0gUmVkaXJlY3RSZWNlaXZlckFjdGl2aXR5LlJFUVVFU1RfT0FVVEggfHwgcmVzICE9IEFjdGl2aXR5LlJFU1VMVF9PSyB8fCBkYXRhID09IG51bGwpIHJldHVybiBudWxsOwogICAgICAgIFN0cmluZyBjb2RlID0gZGF0YS5nZXRTdHJpbmdFeHRyYSgiYXV0aENvZGUiKTsKICAgICAgICBTdHJpbmcgaWQgPSBkYXRhLmdldFN0cmluZ0V4dHJhKCJwcm92aWRlcklkIik7CiAgICAgICAgU3RyaW5nIHZlciA9IGRhdGEuZ2V0U3RyaW5nRXh0cmEoImNvZGVWZXJpZmllciIpOwogICAgICAgIGlmIChjb2RlID09IG51bGwgfHwgdmVyID09IG51bGwpIHJldHVybiBudWxsOwoKICAgICAgICBPQXV0aFByb3ZpZGVyQ29uZmlnIGMgPSBnZXRDb25maWdCeUlkKGlkKTsKICAgICAgICBpZiAoYyA9PSBudWxsKSByZXR1cm4gbnVsbDsKICAgICAgICBleGNoYW5nZUNvZGUoYWN0LCBjLCBjb2RlLCB2ZXIpOwogICAgICAgIHJldHVybiBpZDsKICAgIH0KCiAgICBwcml2YXRlIHN0YXRpYyBTdHJpbmdbXSBnZW5lcmF0ZVBrY2UoKSB0aHJvd3MgRXhjZXB0aW9uIHsKICAgICAgICBTZWN1cmVSYW5kb20gciA9IG5ldyBTZWN1cmVSYW5kb20oKTsKICAgICAgICBieXRlW10gdmIgPSBuZXcgYnl0ZVs5Nl07IHIubmV4dEJ5dGVzKHZiKTsKICAgICAgICBTdHJpbmcgdmVyID0gQmFzZTY0LmdldFVybEVuY29kZXIoKS53aXRob3V0UGFkZGluZygpLmVuY29kZUJ5dGVzKHZiKTsKICAgICAgICBTdHJpbmcgY2hhbGwgPSBCYXNlNjQuZ2V0VXJsRW5jb2RlcigpLndpdGhvdXRQYWRkaW5nKCkuZW5jb2RlQnl0ZXMoCiAgICAgICAgICAgICAgICBNZXNzYWdlRGlnZXN0LmdldEluc3RhbmNlKCJTSEEyNTYiKS5kaWdlc3QodmIpKTsKICAgICAgICByZXR1cm4gbmV3IFN0cmluZ1tde3ZlciwgY2hhbGx9OwogICAgfQoKICAgIHByaXZhdGUgc3RhdGljIFN0cmluZyBnZW5lcmF0ZVN0YXRlKCkgewogICAgICAgIGJ5dGVbXSBiID0gbmV3IGJ5dGVbMzJdOyBuZXcgU2VjdXJlUmFuZG9tKCkubmV4dEJ5dGVzKGIpOwogICAgICAgIHJldHVybiBCYXNlNjQuZ2V0VXJsRW5jb2RlcigpLndpdGhvdXRQYWRkaW5nKCkuZW5jb2RlQnl0ZXMoYik7CiAgICB9CgogICAgcHJpdmF0ZSBzdGF0aWMgVXJpIGJ1aWxkQXV0aFVybChPQXV0aFByb3ZpZGVyQ29uZmlnIGMsIFN0cmluZyBjaGFsbCwgU3RyaW5nIHN0KSB7CiAgICAgICAgcmV0dXJuIFVyaS5wYXJzZShjLmdldEF1dGhvcml6YXRpb25VcmwoKSkuYnVpbGRVcG9uKCkKICAgICAgICAgICAgICAgIC5hcHBlbmRRdWVyeSgiY2xpZW50X2lkIiwgYy5nZXRDbGllbnRJZCgpKQogICAgICAgICAgICAgICAgLmFwcGVuZFF1ZXJ5KCJyZXNwb25zZV90eXBlIiwgImNvZGUiKQogICAgICAgICAgICAgICAgLmFwcGVuZFF1ZXJ5KCJyZWRpcmVjdF91cmkiLCBjLmdldFJlZGlyZWN0VXJpKCkpCiAgICAgICAgICAgICAgICAuYXBwZW5kUXVlcnkoInNjb3BlIiwgYy5nZXRTY29wZXMoKSkKICAgICAgICAgICAgICAgIC5hcHBlbmRRdWVyeSgic3RhdGUiLCBzdCkKICAgICAgICAgICAgICAgIC5hcHBlbmRRdWVyeSgiY29kZV9jaGFsbGVuZ2UiLCBjaGFsbCkKICAgICAgICAgICAgICAgIC5hcHBlbmRRdWVyeSgiY29kZV9jaGFsbGVuZ2VfbWV0aG9kIiwgIlMyNTYiKQogICAgICAgICAgICAgICAgLmFwcGVuZFF1ZXJ5KCJhY2Nlc3NfdHlwZSIsICJvZmZsaW5lIikKICAgICAgICAgICAgICAgIC5hcHBlbmRRdWVyeSgicHJvbXB0IiwgImNvbnNlbnQiKQogICAgICAgICAgICAgICAgLmJ1aWxkKCk7CiAgICB9CgogICAgcHJpdmF0ZSBzdGF0aWMgdm9pZCBleGNoYW5nZUNvZGUoQWN0aXZpdHkgYWN0LCBPQXV0aFByb3ZpZGVyQ29uZmlnIGMsIFN0cmluZyBjb2RlLCBTdHJpbmcgdmVyKSB7CiAgICAgICAgbmV3IFRocmVhZCgoKSAtPiB7CiAgICAgICAgICAgIHRyeSB7CiAgICAgICAgICAgICAgICBTdHJpbmcgYm9keSA9ICJjb2RlPSIgKyBVcmkuZW5jb2RlKGNvZGUpICsKICAgICAgICAgICAgICAgICAgICAgICAgIiZjbGllbnRfaWQ9IiArIFVyaS5lbmNvZGUoYy5nZXRDbGllbnRJZCgpKSArCiAgICAgICAgICAgICAgICAgICAgICAgICImcmVkaXJlY3RfdXJpPSIgKyBVcmkuZW5jb2RlKGMuZ2V0UmVkaXJlY3RVcmkoKSkgKwogICAgICAgICAgICAgICAgICAgICAgICAiJmdyYW50X3R5cGU9YXV0aG9yaXphdGlvbl9jb2RlIiArCiAgICAgICAgICAgICAgICAgICAgICAgICImY29kZV92ZXJpZmllcj0iICsgVXJpLmVuY29kZSh2ZXIpOwoKICAgICAgICAgICAgICAgIFJlc3BvbnNlIHJlc3AgPSBuZXcgT2todHRwQ2xpZW50LkJ1aWxkZXIoKS5idWlsZCgpCiAgICAgICAgICAgICAgICAgICAgICAgIC5uZXdDYWxsKG5ldyBSZXF1ZXN0LkJ1aWxkZXIoKQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIC51cmwoYy5nZXRUb2tlblVybCgpKQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIC5wb3N0KFJlcXVlc3QuQm9keS5jcmVhdGUoTWVkaWFUeXBlLmdldCgiYXBwbGljYXRpb24veC13d3ctZm9ybS11cmxlbmNvZGVkIiksIGJvZHkpKQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIC5idWlsZCgpKS5leGVjdXRlKCk7CgogICAgICAgICAgICAgICAgaWYgKCFyZXNwLmlzU3VjY2Vzc2Z1bCgpKSB7CiAgICAgICAgICAgICAgICAgICAgTG9nZ2VyLmUoIlRva2VuIGZhaWw6ICIgKyByZXNwLmJvZHkoKS5zdHJpbmcoKSk7CiAgICAgICAgICAgICAgICAgICAgcmV0dXJuOwogICAgICAgICAgICAgICAgfQoKICAgICAgICAgICAgICAgIEpTT05PYmplY3QganMgPSBuZXcgSlNPTk9iamVjdChyZXNwLmJvZHkoKS5zdHJpbmcoKSk7CiAgICAgICAgICAgICAgICBTdHJpbmcgYXQgPSBqcy5vcHRTdHJpbmcoImFjY2Vzc190b2tlbiIsICIiKTsKICAgICAgICAgICAgICAgIFN0cmluZyBydCA9IGpzLm9wdFN0cmluZygicmVmcmVzaF90b2tlbiIsICIiKTsKICAgICAgICAgICAgICAgIGxvbmcgZXhwID0ganMub3B0TG9uZygiZXhwaXJlc19pbiIsIDBMKTsKCiAgICAgICAgICAgICAgICBpZiAoYXQuaXNFbXB0eSgpKSB7IExvZ2dlci5lKCJObyBhY2Nlc3NfdG9rZW4iKTsgcmV0dXJuOyB9CgogICAgICAgICAgICAgICAgT0F1dGhUb2tlblN0b3JlLnNhdmVUb2tlbihhY3QsIGMuZ2V0UHJvdmlkZXJJZCgpLCBhdCwgcnQsCiAgICAgICAgICAgICAgICAgICAgICAgIFN5c3RlbS5jdXJyZW50VGltZU1pbGxpcygpICsgZXhwICogMTAwMCk7CiAgICAgICAgICAgICAgICBMb2dnZXIuZCgiVG9rZW4gT0sgIiArIGMuZ2V0TmFtZSgpKTsKICAgICAgICAgICAgfSBjYXRjaCAoRXhjZXB0aW9uIGUpIHtMb2dnZXIuZShlLCAiRXJyb3IiKTsgfQogICAgICAgIH0pLnN0YXJ0KCk7CiAgICB9CgogICAgcHJpdmF0ZSBzdGF0aWMgT0F1dGhQcm92aWRlckNvbmZpZyBnZXRDb25maWdCeUlkKFN0cmluZyBpZCkgewogICAgICAgIGZvciAoT0F1dGhQcm92aWRlckNvbmZpZyBjIDogQUxMX0NPTkZJR1MpIHsKICAgICAgICAgICAgaWYgKGMuZ2V0UHJvdmlkZXJJZCgpLmVxdWFscyhpZCkpIHJldHVybiBjOwogICAgICAgIH0KICAgICAgICByZXR1cm4gT0F1dGhQcm92aWRlckNvbmZpZy5HT09HTEU7CiAgICB9Cn0K
+package com.apiproxy.local;
+
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Bundle;
+
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.security.MessageDigest;
+import java.security.SecureRandom;
+import java.util.Base64;
+
+/**
+ * OAuth PKCE flow: generate challenge, open browser, capture callback, exchange token.
+ */
+public class OAuthFlowManager {
+
+    private static final OAuthProviderConfig[] ALL_CONFIGS = new OAuthProviderConfig[]{OAuthProviderConfig.GOOGLE};
+
+    public static OAuthProviderConfig getConfigByName(String name) {
+        for (OAuthProviderConfig c : ALL_CONFIGS) {
+            if (c.getName().equals(name)) return c;
+        }
+        return OAuthProviderConfig.GOOGLE;
+    }
+
+    public static void startAuthorization(Activity act, OAuthProviderConfig c, int requestCode) {
+        try {
+            String[] pkce = generatePkce();
+            String verifier = pkce[0], challenge = pkce[1];
+            String state = generateState();
+            Uri authUrl = buildAuthUrl(c, challenge, state);
+
+            Bundle extra = new Bundle();
+            extra.putString("providerId", c.getProviderId());
+            extra.putString("codeVerifier", verifier);
+            RedirectReceiverActivity.setPendingAuthInfo(extra);
+
+            act.startActivityForResult(new Intent(Intent.ACTION_VIEW, authUrl), requestCode);
+            Logger.d("OAuth: Starting for " + c.getName());
+        } catch (Exception e) {
+            Logger.e(e, "OAuth: Fail to start");
+        }
+    }
+
+    public static String handleAuthResult(Activity act, int req, int res, Intent data) {
+        if (req != RedirectReceiverActivity.REQUEST_OAUTH || res != Activity.RESULT_OK || data == null)
+            return null;
+        String code = data.getStringExtra("authCode");
+        String id = data.getStringExtra("providerId");
+        String verifier = data.getStringExtra("codeVerifier");
+        if (code == null || verifier == null) return null;
+
+        OAuthProviderConfig c = getConfigById(id);
+        if (c == null) return null;
+        exchangeCode(act, c, code, verifier);
+        return id;
+    }
+
+    private static String[] generatePkce() throws Exception {
+        SecureRandom r = new SecureRandom();
+        byte[] vb = new byte[96];
+        r.nextBytes(vb);
+        String verifier = Base64.getUrlEncoder().withoutPadding().encodeToString(vb);
+        byte[] digest = MessageDigest.getInstance("SHA256").digest(vb);
+        String challenge = Base64.getUrlEncoder().withoutPadding().encodeToString(digest);
+        return new String[]{verifier, challenge};
+    }
+
+    private static String generateState() {
+        byte[] b = new byte[32];
+        new SecureRandom().nextBytes(b);
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(b);
+    }
+
+    private static Uri buildAuthUrl(OAuthProviderConfig c, String challenge, String state) {
+        return Uri.parse(c.getAuthorizationUrl()).buildUpon()
+                .appendQueryParameter("client_id", c.getClientId())
+                .appendQueryParameter("response_type", "code")
+                .appendQueryParameter("redirect_uri", c.getRedirectUri())
+                .appendQueryParameter("scope", c.getScopes())
+                .appendQueryParameter("state", state)
+                .appendQueryParameter("code_challenge", challenge)
+                .appendQueryParameter("code_challenge_method", "S256")
+                .appendQueryParameter("access_type", "offline")
+                .appendQueryParameter("prompt", "consent")
+                .build();
+    }
+
+    private static void exchangeCode(Activity act, OAuthProviderConfig c, String code, String verifier) {
+        new Thread(() -> {
+            try {
+                String body = "code=" + Uri.encode(code)
+                        + "&client_id=" + Uri.encode(c.getClientId())
+                        + "&redirect_uri=" + Uri.encode(c.getRedirectUri())
+                        + "&grant_type=authorization_code"
+                        + "&code_verifier=" + Uri.encode(verifier);
+
+                Response resp = new OkHttpClient.Builder().build()
+                        .newCall(new Request.Builder()
+                                .url(c.getTokenUrl())
+                                .post(RequestBody.create(body, MediaType.get("application/x-www-form-urlencoded")))
+                                .build()).execute();
+
+                if (!resp.isSuccessful()) {
+                    Logger.e("Token fail: " + resp.body().string());
+                    return;
+                }
+
+                JSONObject js = new JSONObject(resp.body().string());
+                String at = js.optString("access_token", "");
+                String rt = js.optString("refresh_token", "");
+                long exp = js.optLong("expires_in", 0L);
+                if (at.isEmpty()) {
+                    Logger.e("No access_token");
+                    return;
+                }
+                OAuthTokenStore.saveToken(act, c.getProviderId(), at, rt,
+                        System.currentTimeMillis() + exp * 1000);
+                Logger.d("Token OK for " + c.getName());
+            } catch (Exception e) {
+                Logger.e(e, "OAuth: exchange error");
+            }
+        }).start();
+    }
+
+    private static OAuthProviderConfig getConfigById(String id) {
+        for (OAuthProviderConfig c : ALL_CONFIGS) {
+            if (c.getProviderId().equals(id)) return c;
+        }
+        return OAuthProviderConfig.GOOGLE;
+    }
+}
