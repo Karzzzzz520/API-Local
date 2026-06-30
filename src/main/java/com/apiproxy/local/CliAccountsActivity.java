@@ -49,10 +49,10 @@ public class CliAccountsActivity extends AppCompatActivity {
                 "GitHub - OAuth Device Flow",
                 "https://github.com/login/device"));
         tools.add(new CliTool("Antigravity CLI",
-                "Google - Google Sign-In OAuth",
+                "Google Sign-In OAuth - Google Cloud 计费",
                 "https://antigravity.google/product/antigravity-cli"));
         tools.add(new CliTool("Gemini CLI",
-                "Google - OAuth PKCE Flow",
+                "Google OAuth PKCE - AI Studio / Cloud 计费",
                 "https://aistudio.google.com/"));
 
         RecyclerView recyclerView = findViewById(R.id.recyclerAccounts);
