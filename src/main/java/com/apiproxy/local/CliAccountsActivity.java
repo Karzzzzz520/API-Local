@@ -1,1 +1,126 @@
-cGFja2FnZSBjb20uYXBpcHJveHkubG9jYWw7CgppbXBvcnQgYW5kcm9pZC5jb250ZW50LkludGVudDsKaW1wb3J0IGFuZHJvaWQubmV0LlVyaTsKaW1wb3J0IGFuZHJvaWQub3MuQnVuZGxlOwoKaW1wb3J0IGFuZHJvaWR4LmFwcGNvbXBhdC5hcHAuQXBwQ29tcGF0QWN0aXZpdHk7CgppbXBvcnQgY29tLmdvb2dsZS5hbmRyb2lkLm1hdGVyaWFsLmFwcGJhci5NYXRlcmlhbFRvb2xiYXI7CgppbXBvcnQgamF2YS51dGlsLkFycmF5TGlzdDsKaW1wb3J0IGphdmEudXRpbC5MaXN0OwoKLyoqCiAqIE9BdXRoIOaOiOadg+mhtemdol/niYjlnovjgILlj6/ku6XpgInmi6nlpITnkIY6CiAqIHBvaW50IOaTjeS9nE9BdXRoIFBLQ0UgRmFtaWx5IGZsb3cgLS0+IENocm9tZSBDdXN0b20gVGFicyDmiZPogIUKICogLS0+IG9hdXRoLWFwaS1wcm94eTovL2NhbGxiYWNrIOaOpeWPmeWKoeeUteWvu+aSreaEj+WKoeeUteWQjAogKiAtLT4gUmVkaXJlY3RSZWNlaXZlckFjdGl2aXR5IOaOpeWPmWF1dGhDb2RlCiAqIC0tPiBPQXV0aEZsb3dNYW5hZ2VyIOi/m2V4Y2hhbmdlIGNvZGUgZm9yIHRva2VuCiAqIC0tPiBPQXV0aFRva2VuU3RvcmUg5L+d5a2Y6K6i5Y2V5a+56LGhCiAqLwpwdWJsaWMgY2xhc3MgQ2xpQWNjb3VudHNBY3Rpdml0eSBleHRlbmRzIEFwcENvbXBhdEFjdGl2aXR5IHsKCiAgICBwcml2YXRlIHN0YXRpYyBmaW5hbCBTdHJpbmdbXSBUT09MX05BTUVTID0geyAiQW50aHJvcGljIiwgIkdpdEh1YiIsICJPcGVuQUkiLCAiR29vZ2xlIiB9OwogICAgcHJpdmF0ZSBzdGF0aWMgZmluYWwgU3RyaW5nW10gVE9PTF9USVRMRVMgPSB7ICJDbGF1ZGUgQ29kZSIsICJDb3BpbG90IENMSSIsICJDb2RleCBDTEkiLCAiR2VtaW5pIENMSSIgfTsKICAgIHByaXZhdGUgc3RhdGljIGZpbmFsIFN0cmluZ1tdIFRPT0xfREVTQ1MgPSB7CiAgICAgICAgIkFudGhyb3BpYyBDTEkgLSBQS0NFIE9BdXRoIOmBh+W9lVxu6ZyA6KaBQ2hvbWUnIERlIE9hdXRoIFBLLkMuIEVkIHRvbXVld2VyayIsCiAgICAgICAgIkdpdEh1YiBEZXZpY2UgRmxvdyAtIOmXuuW3tOaUtuW8gOWQr1xu4oCZIHNpbmNlIEdpdEh1YiBkbyBFbmltIG5vbiB0b2xkIGVqIiwKICAgICAgICAiT3BlbkFJIEFwaSBLZXkgLSBIYXZlIG5vIHB1YmxpYyBPQXV0aFxu4oCZ4oCZIFNFTUUuIFNURU4uIE5PIFJFQUxMWSAiLAogICAgICAgICJHb29nbGUgR2VtaW5pIENMSSAtIFPigJkgc3TDqyBhbSBQSyBDRU9BdXRoIEZsb3cgUG9yIHRoZSBjdXJyZW50IFRPRE8iCiAgICB9OwoKICAgIEBPdmVycmlkZQogICAgcHJvdGVjdGVkIHZvaWQgb25DcmVhdGUoQnVuZGxlIHNhdmVkSW5zdGFuY2VTdGF0ZSkgewogICAgICAgIHN1cGVyLm9uQ3JlYXRlKHNhdmVkSW5zdGFuY2VTdGF0ZSk7CiAgICAgICAgc2V0Q29udGVudFZpZXcoUi5sYXlvdXQuYWN0aXZpdHlfY2xpX2FjY291bnRzKTsKCiAgICAgICAgTWF0ZXJpYWxUb29sYmFyIHRvb2xiYXIgPSBmaW5kVmlld0J5SWQoUi5pZC50b29sYmFyKTsKICAgICAgICB0b29sYmFyLnNldFRpdGxlKCJPQXV0aCDmjojmnYMiKTsKICAgICAgICBzZXRTdXBwb3J0QWN0aW9uQmFyKHRvb2xiYXIpOwogICAgICAgIGlmIChnZXRTdXBwb3J0QWN0aW9uQmFyKCkgIT0gbnVsbCkgZ2V0U3VwcG9ydEFjdGlvbkJhcigpLnNldERpc3BsYXlIb21lQXNVcEVuYWJsZWQodHJ1ZSk7CgogICAgICAgIC8vIOaehOW7uSB0b2tlbiDnirbmgIEg5bm25bqf5Y+v5Lul6YCa6L+B6IGU57O7CiAgICAgICAgZm9yIChpbnQgaSA9IDA7IGkgPCBUT09MX05BTUVTLmxlbmd0aDsgaSsrKSB7CiAgICAgICAgICAgIFN0cmluZyBwcm92aWRlcklkID0gVE9PTF9OQU1FU1tpXTsKICAgICAgICAgICAgU3RyaW5nIHRva2VuU3RhdHVzID0gIk7Cv0EiOwogICAgICAgICAgICBpZiAoT0F1dGhUb2tlblN0b3JlLmhhc1ZhbGlkVG9rZW4odGhpcywgcHJvdmlkZXJJZCkpIHsKICAgICAgICAgICAgICAgIHRva2VuU3RhdHVzID0gIuKckuKIkCAiICsgT0F1dGhUb2tlblN0b3JlLmdldEFjY2Vzc1Rva2VuKHRoaXMsIHByb3ZpZGVySWQpLnN1YnN0cmluZygwLCA4KSArICIuLi4iOwogICAgICAgICAgICB9IGVsc2UgaWYgKE9BdXRoVG9rZW5TdG9yZS5oYXNSZWZyZXNoVG9rZW4odGhpcywgcHJvdmlkZXJJZCkpIHsKICAgICAgICAgICAgICAgIHRva2VuU3RhdHVzID0gIuKckuKIkCDov5vnlKjkuK3vvIzlj43ppojlt7Lov4cg4pyIIjsKICAgICAgICAgICAgfQogICAgICAgICAgICBUT09MX0RFU0NTW2ldID0gVE9PTF9ERV9TQ1NbaV0ucmVwbGFjZSgiTsKvQSIsIHRva2VuU3RhdHVzKTsKICAgICAgICB9CgogICAgICAgIFJlY3ljbGVyVmlldyByZWN5Y2xlclZpZXcgPSBmaW5kVmlld0J5SWQoUi5pZC5yZWN5Y2xlckFjY291bnRzKTsKICAgICAgICByZWN5Y2xlclZpZXcuc2V0TGF5b3V0TWFuYWdlcihuZXcgTGluZWFyTGF5b3V0TWFuYWdlcih0aGlzKSk7CiAgICAgICAgcmVjeWNsZXJWaWV3LnNldEFkYXB0ZXIobmV3IFRvb2xBZGFwdGVyKHRvb2xzLCB0b29sIC0+IHsKICAgICAgICAgICAgT0F1dGhGbG93TWFuYWdlci5zdGFydEF1dGhvcml6YXRpb24oCiAgICAgICAgICAgICAgICAgICAgdGhpcywKICAgICAgICAgICAgICAgICAgICBPQXV0aEZsb3dNYW5hZ2VyLmdldENvbmZpZ0J5TmFtZSh0b29sLmNvbmZpZ05hbWUpLAogICAgICAgICAgICAgICAgICAgIFJlZGlyZWN0UmVjZWl2ZXJBY3Rpdml0eS5SRVFVRVNUX09BVVRIKTsKICAgICAgICB9KSk7CgogICAgICAgIGZpbmRWaWV3QnlJZChSLmlkLmVtcHR5Vmlldykuc2V0VmlzaWJpbGl0eShWaWV3LkdPTkUpOwogICAgICAgIGZpbmRWaWV3QnlJZChSLmlkLmJ0bkFkZEFjY291bnQpLnNldFZpc2liaWxpdHkoVmlldy5HT05FKTsKICAgIH0KCiAgICBAT3ZlcnJpZGUKICAgIHByb3RlY3RlZCB2b2lkIG9uQWN0aXZpdHlSZXN1bHQoaW50IHJlcXVlc3RDb2RlLCBpbnQgcmVzdWx0Q29kZSwgSW50ZW50IGRhdGEpIHsKICAgICAgICBzdXBlci5vbkFjdGl2aXR5UmVzdWx0KHJlcXVlc3RDb2RlLCByZXN1bHRDb2RlLCBkYXRhKTsKICAgICAgICBpZiAocmVxdWVzdENvZGUgPT0gUmVkaXJlY3RSZWNlaXZlckFjdGl2aXR5LlJFUVVFU1RfT0FVVEgpIHsKICAgICAgICAgICAgU3RyaW5nIHByb3ZpZGVySWQgPSBPQXV0aEZsb3dNYW5hZ2VyLmhhbmRsZUF1dGhSZXN1bHQodGhpcywgcmVxdWVzdENvZGUsIHJlc3VsdENvZGUsIGRhdGEpOwogICAgICAgICAgICBpZiAocHJvdmlkZXJJZCAhPSBudWxsKSB7CiAgICAgICAgICAgICAgICBMb2dnZXIuZCgiT0F1dGg6IFN1Y2Nlc3NmdWxseSBhdXRoZW50aWNhdGVkIGZvciAiICsgcHJvdmlkZXJJZCk7CiAgICAgICAgICAgICAgICAvLyByZWZyZXNoIGFkYXB0ZXIgdG8gc2hvdyB0b2tlbiBzdGF0dXMKICAgICAgICAgICAgICAgIHJlY3ljbGVyVmlldy5nZXRBZGFwdGVyKCkubm90aWZ5RGF0YXNldENoYW5nZWQoKTsKICAgICAgICAgICAgfQogICAgICAgIH0KICAgIH0KCiAgICBAT3ZlcnJpZGUKICAgIHB1YmxpYyBib29sZWFuIG9uT3B0aW9uc0l0ZW1TZWxlY3RlZChATm9uTnVsbCBNZW51SXRlbSBpdGVtKSB7CiAgICAgICAgaWYgKGl0ZW0uZ2V0SXRlbUlkKCkgPT0gYW5kcm9pZC5SLmlkLmhvbWUpIHsgZmluaXNoKCk7IHJldHVybiB0cnVlOyB9CiAgICAgICAgcmV0dXJuIHN1cGVyLm9uT3B0aW9uc0l0ZW1TZWxlY3RlZChpdGVtKTsKICAgIH0KCiAgICAvLyBUb29sIG1vZGVsIGFuZCBhZGFwdGVyIHJlbWFpbiBzYW1lIGFzIGJlZm9yZQogICAgcHJpdmF0ZSBzdGF0aWMgY2xhc3MgT0F1dGhUb29sIHsKICAgICAgICBTdHJpbmcgbmFtZSwgZGVzY3JpcHRpb24sIGNvbmZpZ05hbWU7CiAgICAgICAgT0F1dGhUb29sKFN0cmluZyBuYW1lLCBTdHJpbmcgZGVzY3JpcHRpb24sIFN0cmluZyBjb25maWdOYW1lKSB7CiAgICAgICAgICAgIHRoaXMubmFtZSA9IG5hbWU7CiAgICAgICAgICAgIHRoaXMuZGVzY3JpcHRpb24gPSBkZXNjcmlwdGlvbjsKICAgICAgICAgICAgdGhpcy5jb25maWdOYW1lID0gY29uZmlnTmFtZTsKICAgICAgICB9CiAgICB9CgogICAgcHJpdmF0ZSBmaW5hbCBMaXN0PE9BdXRoVG9vbD4gdG9vbHMgPSBuZXcgQXJyYXlMaXN0PD4oKTsKCiAgICB7CiAgICAgICAgdG9vbHMuYWRkKG5ldyBPQXV0aFRvb2woVE9PTF9USVRMRVNbMF0sIFRPT0xfREVTQ1NbMF0sIFRPT0xfTkFNRVNbMF0pKTsKICAgICAgICB0b29scy5hZGQobmV3IE9BdXRoVG9vbChUT09MX1RJVExFU1sxXSwgVE9PTF9ERV9TQ1NbMV0sIFRPT0xfTkFNRVNbMV0pKTsKICAgICAgICB0b29scy5hZGQobmV3IE9BdXRoVG9vbChUT09MX1RJVExFU1syXSwgVE9PTF9ERV9TQ1NbMl0sIFRPT0xfTkFNRVNbMl0pKTsKICAgICAgICB0b29scy5hZGQobmV3IE9BdXRoVG9vbChUT09MX1RJVExFU1szXSwgVE9PTF9ERV9TQ1NbM10sIFRPT0xfTkFNRVNbM10pKTsKICAgIH0KCiAgICBwcml2YXRlIFJlY3ljbGVyVmlldyByZWN5Y2xlclZpZXc7CgogICAgcHJpdmF0ZSBzdGF0aWMgY2xhc3MgVG9vbEFkYXB0ZXIgZXh0ZW5kcyBSZWN5Y2xlclZpZXcuQWRhcHRlcjxUb29sQWRhcHRlci5WSD4gewogICAgICAgIHByaXZhdGUgZmluYWwgTGlzdDxPQXV0aFRvb2w+IGRhdGE7CiAgICAgICAgcHJpdmF0ZSBmaW5hbCBPblRvb2xDbGlja0xpc3RlbmVyIGxpc3RlbmVyOwogICAgICAgIGludGVyZmFjZSBPblRvb2xDbGlja0xpc3RlbmVyIHsgdm9pZCBvbkNsaWNrKE9BdXRoVG9vbCB0b29sKTsgfQoKICAgICAgICBUb29sQWRhcHRlcihMaXN0PE9BdXRoVG9vbD4gZGF0YSwgT25Ub29sQ2xpY2tMaXN0ZW5lciBsaXN0ZW5lcikgewogICAgICAgICAgICB0aGlzLmRhdGEgPSBkYXRhOwogICAgICAgICAgICB0aGlzLmxpc3RlbmVyID0gbGlzdGVuZXI7CiAgICAgICAgfQoKICAgICAgICBATm9uTnVsbAogICAgICAgIEBPdmVycmlkZQogICAgICAgIHB1YmxpYyBWSCBvbkNyZWF0ZVZpZXdIb2xkZXIoTk9uTnVsbCBWaWV3R3JvdXAgcGFyZW50LCBpbnQgdmlld1R5cGUpIHsKICAgICAgICAgICAgTGluZWFyTGF5b3V0IGl0ZW0gPSBuZXcgTGluZWFyTGF5b3V0KHBhcmVudC5nZXRDb250ZXh0KCkpOwogICAgICAgICAgICBpdGVtLnNldE9yaWVudGF0aW9uKExpbmVhckxheW91dC5WRVJUSUNBTCk7CiAgICAgICAgICAgIGl0ZW0uc2V0UGFkZGluZygzMiwgMjQsIDMyLCAyNCk7CiAgICAgICAgICAgIFJlY3ljbGVyVmlldy5MYXlvdXRQYXJhbXMgcmxwID0gbmV3IFJlY3ljbGVyVmlldy5MYXlvdXRQYXJhbXMoCiAgICAgICAgICAgICAgICAgICAgVmlld0dyb3VwLkxheW91dFBhcmFtcy5NQVRDSF9QQVJFTlQsIFZpZXdHcm91cC5MYXlvdXRQYXJhbXMuV1JBUF9DT05URU5UKTsKICAgICAgICAgICAgcmxwLmJvdHRvbU1hcmdpbiA9IDEyOwogICAgICAgICAgICBpdGVtLnNldExheW91dFBhcmFtcyhybHApOwoKICAgICAgICAgICAgYW5kcm9pZC5ncmFwaGljcy5kcmF3YWJsZS5HcmFkaWVudERyYXdhYmxlIGJnID0gbmV3IGFuZHJvaWQuZ3JhcGhpY3MuZHJhd2FibGUuR3JhZGllbnREcmF3YWJsZSgpOwogICAgICAgICAgICBiZy5zZXRDb3JuZXJSYWRpdXMoMTYpOwogICAgICAgICAgICBiZy5zZXRDb2xvcihhbmRyb2lkLmdyYXBoaWNzLkNvbG9yLnBhcnNlQ29sb3IoIiMxQTAwMDAwMCIpKTsKICAgICAgICAgICAgaXRlbS5zZXRCYWNrZ3JvdW5kKGJnKTsKCiAgICAgICAgICAgIFRleHRWaWV3IHR2TmFtZSA9IG5ldyBUZXh0VmlldyhwYXJlbnQuZ2V0Q29udGV4dCgpKTsKICAgICAgICAgICAgdHZOYW1lLnNldFRleHRTaXplKDE4KTsKICAgICAgICAgICAgdHZOYW1lLmdldFBhaW50KCkuc2V0RmFrZUJvbGRUZXh0KHRydWUpOwogICAgICAgICAgICBUZXh0VmlldyB0dkRlc2MgPSBuZXcgVGV4dFZpZXcocGFyZW50LmdldENvbnRleHQoKSk7CiAgICAgICAgICAgIHR2RGVzYy5zZXRUZXh0U2l6ZSgxMyk7CiAgICAgICAgICAgIHR2RGVzYy5zZXRBbHBoYSgwLjdmKTsKICAgICAgICAgICAgaXRlbS5hZGRWaWV3KHR2TmFtZSk7CiAgICAgICAgICAgIGl0ZW0uYWRkVmlldyh0dkRlc2MpOwogICAgICAgICAgICByZXR1cm4gbmV3IFZIKGl0ZW0sIHR2TmFtZSwgdHZEZXNjKTsKICAgICAgICB9CgogICAgICAgIEBPdmVycmlkZQogICAgICAgIHB1YmxpYyB2b2lkIG9uQmluZFZpZXdIb2xkZXIoTk9uTnVsbCBWSCBoLCBpbnQgcG9zKSB7CiAgICAgICAgICAgIE9BdXRoVG9vbCB0b29sID0gZGF0YS5nZXQocG9zKTsKICAgICAgICAgICAgaC50dk5hbWUuc2V0VGV4dCh0b29sLm5hbWUpOwogICAgICAgICAgICBoLnR2RGVzYy5zZXRUZXh0KHRvb2wuZGVzY3JpcHRpb24pOwogICAgICAgICAgICBoLml0ZW1WaWV3LnNldE9uQ2xpY2tMaXN0ZW5lcih2IC0+IGxpc3RlbmVyLm9uQ2xpY2sodG9vbCkpOwogICAgICAgIH0KCiAgICAgICAgQE92ZXJyaWRlCiAgICAgICAgcHVibGljIGludCBnZXRJdGVtQ291bnQoKSB7IHJldHVybiBkYXRhLnNpemUoKTsgfQoKICAgICAgICBzdGF0aWMgY2xhc3MgVkggZXh0ZW5kcyBSZWN5Y2xlclZpZXcuVmlld0hvbGRlciB7CiAgICAgICAgICAgIFRleHRWaWV3IHR2TmFtZSwgdHZEZXNjOwogICAgICAgICAgICBWSChWaWV3IHYsIFRleHRWaWV3IHR2TmFtZSwgVGV4dFZpZXcgdHZEZXNjKSB7CiAgICAgICAgICAgICAgICBzdXBlcih2KTsKICAgICAgICAgICAgICAgIHRoaXMudHZOYW1lID0gdHZOYW1lOwogICAgICAgICAgICAgICAgdGhpcy50dkRlc2MgPSB0dkRlc2M7CiAgICAgICAgICAgIH0KICAgICAgICB9CiAgICB9Cn0K
+package com.apiproxy.local;
+
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Bundle;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.appbar.MaterialToolbar;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class CliAccountsActivity extends AppCompatActivity {
+
+    private static class OAuthTool {
+        String name, description, authUrl;
+        OAuthTool(String name, String description, String authUrl) {
+            this.name = name;
+            this.description = description;
+            this.authUrl = authUrl;
+        }
+    }
+
+    private final List<OAuthTool> tools = new ArrayList<>();
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_cli_accounts);
+
+        MaterialToolbar toolbar = findViewById(R.id.toolbar);
+        toolbar.setTitle("OAuth 授权");
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        tools.add(new OAuthTool("Claude Code",
+                "Anthropic CLI - OAuth Device Flow",
+                "https://console.anthropic.com/settings/keys"));
+        tools.add(new OAuthTool("Copilot CLI",
+                "GitHub CLI - OAuth Device Flow",
+                "https://github.com/login/device"));
+        tools.add(new OAuthTool("Codex CLI",
+                "OpenAI CLI - API Key (no public OAuth)",
+                "https://platform.openai.com/api-keys"));
+        tools.add(new OAuthTool("Gemini CLI",
+                "Google Gemini CLI - OAuth PKCE Flow",
+                "https://aistudio.google.com/app/apikey"));
+
+        RecyclerView recyclerView = findViewById(R.id.recyclerAccounts);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setAdapter(new ToolAdapter(tools, tool -> {
+            Logger.d("Opening: " + tool.name + " -> " + tool.authUrl);
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(tool.authUrl)));
+        }));
+
+        findViewById(R.id.emptyView).setVisibility(android.view.View.GONE);
+        findViewById(R.id.btnAddAccount).setVisibility(android.view.View.GONE);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(android.view.MenuItem item) {
+        if (item.getItemId() == android.R.id.home) { finish(); return true; }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private static class ToolAdapter extends RecyclerView.Adapter<ToolAdapter.VH> {
+        private final List<OAuthTool> data;
+        private final OnToolClickListener listener;
+        interface OnToolClickListener { void onClick(OAuthTool tool); }
+
+        ToolAdapter(List<OAuthTool> data, OnToolClickListener listener) {
+            this.data = data;
+            this.listener = listener;
+        }
+
+        @androidx.annotation.NonNull
+        @Override
+        public VH onCreateViewHolder(@androidx.annotation.NonNull android.view.ViewGroup parent, int viewType) {
+            android.widget.LinearLayout item = new android.widget.LinearLayout(parent.getContext());
+            item.setOrientation(android.widget.LinearLayout.VERTICAL);
+            item.setPadding(32, 24, 32, 24);
+            RecyclerView.LayoutParams rlp = new RecyclerView.LayoutParams(
+                    android.view.ViewGroup.LayoutParams.MATCH_PARENT, android.view.ViewGroup.LayoutParams.WRAP_CONTENT);
+            rlp.bottomMargin = 12;
+            item.setLayoutParams(rlp);
+
+            android.graphics.drawable.GradientDrawable bg = new android.graphics.drawable.GradientDrawable();
+            bg.setCornerRadius(16);
+            bg.setColor(android.graphics.Color.parseColor("#1A000000"));
+            item.setBackground(bg);
+
+            android.widget.TextView tvName = new android.widget.TextView(parent.getContext());
+            tvName.setTextSize(18);
+            tvName.getPaint().setFakeBoldText(true);
+            android.widget.TextView tvDesc = new android.widget.TextView(parent.getContext());
+            tvDesc.setTextSize(13);
+            tvDesc.setAlpha(0.7f);
+            item.addView(tvName);
+            item.addView(tvDesc);
+            return new VH(item, tvName, tvDesc);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull VH h, int pos) {
+            OAuthTool tool = data.get(pos);
+            h.tvName.setText(tool.name);
+            h.tvDesc.setText(tool.description);
+            h.itemView.setOnClickListener(v -> listener.onClick(tool));
+        }
+
+        @Override
+        public int getItemCount() { return data.size(); }
+
+        static class VH extends RecyclerView.ViewHolder {
+            android.widget.TextView tvName, tvDesc;
+            VH(android.view.View v, android.widget.TextView tvName, android.widget.TextView tvDesc) {
+                super(v);
+                this.tvName = tvName;
+                this.tvDesc = tvDesc;
+            }
+        }
+    }
+}
