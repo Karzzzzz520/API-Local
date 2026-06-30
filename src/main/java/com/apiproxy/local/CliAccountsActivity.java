@@ -3,7 +3,13 @@ package com.apiproxy.local;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -56,12 +62,12 @@ public class CliAccountsActivity extends AppCompatActivity {
             startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(tool.authUrl)));
         }));
 
-        findViewById(R.id.emptyView).setVisibility(android.view.View.GONE);
-        findViewById(R.id.btnAddAccount).setVisibility(android.view.View.GONE);
+        findViewById(R.id.emptyView).setVisibility(View.GONE);
+        findViewById(R.id.btnAddAccount).setVisibility(View.GONE);
     }
 
     @Override
-    public boolean onOptionsItemSelected(android.view.MenuItem item) {
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == android.R.id.home) { finish(); return true; }
         return super.onOptionsItemSelected(item);
     }
@@ -76,14 +82,14 @@ public class CliAccountsActivity extends AppCompatActivity {
             this.listener = listener;
         }
 
-        @androidx.annotation.NonNull
+        @NonNull
         @Override
-        public VH onCreateViewHolder(@androidx.annotation.NonNull android.view.ViewGroup parent, int viewType) {
-            android.widget.LinearLayout item = new android.widget.LinearLayout(parent.getContext());
-            item.setOrientation(android.widget.LinearLayout.VERTICAL);
+        public VH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            LinearLayout item = new LinearLayout(parent.getContext());
+            item.setOrientation(LinearLayout.VERTICAL);
             item.setPadding(32, 24, 32, 24);
             RecyclerView.LayoutParams rlp = new RecyclerView.LayoutParams(
-                    android.view.ViewGroup.LayoutParams.MATCH_PARENT, android.view.ViewGroup.LayoutParams.WRAP_CONTENT);
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             rlp.bottomMargin = 12;
             item.setLayoutParams(rlp);
 
@@ -92,10 +98,10 @@ public class CliAccountsActivity extends AppCompatActivity {
             bg.setColor(android.graphics.Color.parseColor("#1A000000"));
             item.setBackground(bg);
 
-            android.widget.TextView tvName = new android.widget.TextView(parent.getContext());
+            TextView tvName = new TextView(parent.getContext());
             tvName.setTextSize(18);
             tvName.getPaint().setFakeBoldText(true);
-            android.widget.TextView tvDesc = new android.widget.TextView(parent.getContext());
+            TextView tvDesc = new TextView(parent.getContext());
             tvDesc.setTextSize(13);
             tvDesc.setAlpha(0.7f);
             item.addView(tvName);
@@ -115,8 +121,8 @@ public class CliAccountsActivity extends AppCompatActivity {
         public int getItemCount() { return data.size(); }
 
         static class VH extends RecyclerView.ViewHolder {
-            android.widget.TextView tvName, tvDesc;
-            VH(android.view.View v, android.widget.TextView tvName, android.widget.TextView tvDesc) {
+            TextView tvName, tvDesc;
+            VH(View v, TextView tvName, TextView tvDesc) {
                 super(v);
                 this.tvName = tvName;
                 this.tvDesc = tvDesc;
