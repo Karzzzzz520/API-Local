@@ -18,6 +18,7 @@
 - ➕ **自定义服务商** — 支持任意 API 兼容的服务商
 - 📋 **实时转发日志** — 监控请求状态
 - 🖼️ **内置服务商图标** — OpenAIGPT、Gemini、Claude、DeepSeek 专属 Logo
+- 🔐 **CLI 工具 OAuth 授权** — Claude Code / Copilot CLI / Antigravity CLI / Gemini CLI
 
 ## 📥 下载
 
@@ -78,6 +79,10 @@ cd API-Local
 编译后的 APK 位于 `build/outputs/apk/release/`。
 
 ## 📜 更新日志
+
+### v1.2.7
+- 🔐 新增 CLI 工具 OAuth 授权页面
+- 支持 Claude Code、Copilot CLI、Antigravity CLI、Gemini CLI 四种授权方式
 
 ### v1.2.1
 - 🖼️ 更新内置服务商图标，更清晰美观
