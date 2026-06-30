@@ -1,1 +1,51 @@
-cGFja2FnZSBjb20uYXBpcHJveHkubG9jYWw7CgppbXBvcnQgYW5kcm9pZC5jb250ZW50LkludGVudDsKaW1wb3J0IGFuZHJvaWQubmV0LlVyaTsKaW1wb3J0IGFuZHJvaWQub3MuQnVuZGxlOwoKaW1wb3J0IGFuZHJvaWR4LmFwcGNvbXBhdC5hcHAuQXBwQ29tcGF0QWN0aXZpdHk7CgovKioKICog5o6l5Y+Z5q2j5ZyK6K+75Y+WQ3VzdG9tIFNjaGVtZeW3tOS4i+adpeaOpeWPluWKoeeUteacjeWKoemZkCjwn5G744CQb2F1dGgtYXBpLXByb3h5Oi8vY2FsbGJhY2s/Y29kZT3igKbigKbil4vvvIkKICovCnB1YmxpYyBjbGFzcyBSZWRpcmVjdFJlY2VpdmVyQWN0aXZpdHkgZXh0ZW5kcyBBcHBDb21wYXRBY3Rpdml0eSB7CgogICAgcHVibGljIHN0YXRpYyBmaW5hbCBpbnQgUkVRVUVTVF9PQVVUSCA9IDEwMDE7CiAgICBwdWJsaWMgc3RhdGljIGZpbmFsIFN0cmluZyBFWFRSQV9BVVRIfUNPREUgPSAiYXV0aENvZGUiOwogICAgcHVibGljIHN0YXRpYyBmaW5hbCBTdHJpbmcgRVhUUkFfUFJPVklERVJfSUQgPSAicHJvdmlkZXJJZCI7CiAgICBwdWJsaWMgc3RhdGljIGZpbmFsIFN0cmluZyBFWFRSQV9DT0RFX1ZFUklGSUVSID0gImNvZGVWZXJpZmllciI7CgogICAgcHJpdmF0ZSBzdGF0aWMgQnVuZGxlIHBlbmRpbmdBdXRoSW5mbyA9IG51bGw7CgogICAgcHVibGljIHN0YXRpYyBzeW5jaHJvbml6ZWQgdm9pZCBzZXRQZW5kaW5nQXV0aEluZm8oQnVuZGxlIGJ1bmRsZSkgewogICAgICAgIHBlbmRpbmdBdXRoSW5mbyA9IGJ1bmRsZTsKICAgIH0KCiAgICBAT3ZlcnJpZGUKICAgIHByb3RlY3RlZCB2b2lkIG9uQ3JlYXRlKEJ1bmRsZSBzYXZlZEluc3RhbmNlU3RhdGUpIHsKICAgICAgICBzdXBlci5vbkNyZWF0ZShzYXZlZEluc3RhbmNlU3RhdGUpOwoKICAgICAgICBJbnRlbnQgaW50ZW50ID0gZ2V0SW50ZW50KCk7CiAgICAgICAgVXJpIGRhdGEgPSBpbnRlbnQuZ2V0RGF0YSgpOwogICAgICAgIFN0cmluZyBzY2hlbWUgPSBpbnRlbnQuZ2V0U2NoZW1lKCk7CgogICAgICAgIExvZ2dlci5kKCJSZWRpcmVjdDogU2NoZW1lPSIgKyBzY2hlbWUgKyAiIERhdGE9IiArIChkYXRhICE9IG51bGwgPyBkYXRhLnRvU3RyaW5nKCkgOiAibnVsbCIpKTsKCiAgICAgICAgU3RyaW5nIGF1dGhDb2RlID0gbnVsbDsKCiAgICAgICAgaWYgKGRhdGEgIT0gbnVsbCkgewogICAgICAgICAgICBhdXRoQ29kZSA9IGRhdGEuZ2V0UXVlcnlQYXJhbWV0ZXIoImNvZGUiKTsKICAgICAgICB9CgogICAgICAgIEludGVudCByZXN1bHRJbnRlbnQgPSBuZXcgSW50ZW50KCk7CiAgICAgICAgaWYgKGF1dGhDb2RlICE9IG51bGwpIHsKICAgICAgICAgICAgcmVzdWx0SW50ZW50LnB1dEV4dHJhKCJhdXRoQ29kZSIsIGF1dGhDb2RlKTsKICAgICAgICAgICAgaWYgKHBlbmRpbmdBdXRoSW5mbyAhPSBudWxsKSB7CiAgICAgICAgICAgICAgICByZXN1bHRJbnRlbnQucHV0RXh0cmEoInByb3ZpZGVySWQiLCBwZW5kaW5nQXV0aEluZm8uZ2V0U3RyaW5nKCJwcm92aWRlcklkIikpOwogICAgICAgICAgICAgICAgcmVzdWx0SW50ZW50LnB1dEV4dHJhKCJjb2RlVmVyaWZpZXIiLCBwZW5kaW5nQXV0aEluZm8uZ2V0U3RyaW5nKCJjb2RlVmVyaWZpZXIiKSk7CiAgICAgICAgICAgIH0KICAgICAgICAgICAgc2V0UmVzdWx0KFJFU1VMVF9PSywgcmVzdWx0SW50ZW50KTsKICAgICAgICB9IGVsc2UgewogICAgICAgICAgICBMb2dnZXIuZSgiUmVkaXJlY3Q6IE5vIGF1dGggY29kZSBpbiBjYWxsYmFjayIpOwogICAgICAgICAgICBzZXRSZXN1bHQoUkVTVUxUX0NBTkNFTEVEKTsKICAgICAgICB9CgogICAgICAgIGZpbmlzaCgpOwogICAgfQp9Cg==
+package com.apiproxy.local;
+
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Bundle;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+/**
+ * Captures OAuth callback via custom scheme (oauth-api-proxy://callback?code=...).
+ */
+public class RedirectReceiverActivity extends AppCompatActivity {
+
+    public static final int REQUEST_OAUTH = 1001;
+
+    private static Bundle pendingAuthInfo = null;
+
+    public static synchronized void setPendingAuthInfo(Bundle bundle) {
+        pendingAuthInfo = bundle;
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        Intent intent = getIntent();
+        Uri data = intent.getData();
+
+        Logger.d("Redirect: data=" + (data != null ? data.toString() : "null"));
+
+        String authCode = null;
+        if (data != null) {
+            authCode = data.getQueryParameter("code");
+        }
+
+        Intent resultIntent = new Intent();
+        if (authCode != null) {
+            resultIntent.putExtra("authCode", authCode);
+            if (pendingAuthInfo != null) {
+                resultIntent.putExtra("providerId", pendingAuthInfo.getString("providerId"));
+                resultIntent.putExtra("codeVerifier", pendingAuthInfo.getString("codeVerifier"));
+            }
+            setResult(RESULT_OK, resultIntent);
+        } else {
+            Logger.e("Redirect: No auth code");
+            setResult(RESULT_CANCELED);
+        }
+
+        finish();
+    }
+}
