@@ -21,16 +21,16 @@ import java.util.List;
 
 public class CliAccountsActivity extends AppCompatActivity {
 
-    private static class CliTool {
+    private static class OAuthTool {
         String name, description, authUrl;
-        CliTool(String name, String description, String authUrl) {
+        OAuthTool(String name, String description, String authUrl) {
             this.name = name;
             this.description = description;
             this.authUrl = authUrl;
         }
     }
 
-    private final List<CliTool> tools = new ArrayList<>();
+    private final List<OAuthTool> tools = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,27 +38,27 @@ public class CliAccountsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_cli_accounts);
 
         MaterialToolbar toolbar = findViewById(R.id.toolbar);
-        toolbar.setTitle("CLI 工具授权");
+        toolbar.setTitle("OAuth 授权");
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        tools.add(new CliTool("Claude Code",
-                "Anthropic 的 CLI 编程工具\n需 API Key 授权",
-                "https://console.anthropic.com/settings/keys"));
-        tools.add(new CliTool("Copilot CLI",
-                "GitHub 的 AI CLI 助手\n需 GitHub Token 授权",
-                "https://github.com/settings/tokens"));
-        tools.add(new CliTool("Codex CLI",
-                "OpenAI 的 CLI 编程工具\n需 API Key 授权",
-                "https://platform.openai.com/api-keys"));
-        tools.add(new CliTool("Gemini CLI",
-                "Google 的 AI CLI 工具\n需 API Key 授权",
-                "https://aistudio.google.com/app/apikey"));
+        tools.add(new OAuthTool("Claude Code",
+                "Anthropic CLI 工具\nOAuth Device Flow 授权",
+                "https://claude.ai/login"));
+        tools.add(new OAuthTool("Copilot CLI",
+                "GitHub CLI 助手\nOAuth Device Flow 授权",
+                "https://github.com/login/device"));
+        tools.add(new OAuthTool("Codex CLI",
+                "OpenAI CLI 编程工具\nOAuth Device Flow 授权",
+                "https://platform.openai.com"));
+        tools.add(new OAuthTool("Gemini CLI",
+                "Google AI CLI 工具\nOAuth 授权",
+                "https://aistudio.google.com"));
 
         RecyclerView recyclerView = findViewById(R.id.recyclerAccounts);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(new ToolAdapter(tools, tool -> {
-            Logger.d("Opening auth: " + tool.name + " -> " + tool.authUrl);
+            Logger.d("Opening OAuth: " + tool.name + " -> " + tool.authUrl);
             startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(tool.authUrl)));
         }));
 
@@ -73,11 +73,11 @@ public class CliAccountsActivity extends AppCompatActivity {
     }
 
     private static class ToolAdapter extends RecyclerView.Adapter<ToolAdapter.VH> {
-        private final List<CliTool> data;
+        private final List<OAuthTool> data;
         private final OnToolClickListener listener;
-        interface OnToolClickListener { void onClick(CliTool tool); }
+        interface OnToolClickListener { void onClick(OAuthTool tool); }
 
-        ToolAdapter(List<CliTool> data, OnToolClickListener listener) {
+        ToolAdapter(List<OAuthTool> data, OnToolClickListener listener) {
             this.data = data;
             this.listener = listener;
         }
@@ -111,7 +111,7 @@ public class CliAccountsActivity extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(@NonNull VH h, int pos) {
-            CliTool tool = data.get(pos);
+            OAuthTool tool = data.get(pos);
             h.tvName.setText(tool.name);
             h.tvDesc.setText(tool.description);
             h.itemView.setOnClickListener(v -> listener.onClick(tool));
