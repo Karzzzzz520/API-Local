@@ -23,8 +23,8 @@ android {
         applicationId = 'com.apiproxy.local'
         minSdk = 26
         targetSdk = 36
-        versionCode = 8
-        versionName = "v1.2.7"
+        versionCode = 9
+        versionName = "v1.2.8"
     }
     buildTypes {
         release {
